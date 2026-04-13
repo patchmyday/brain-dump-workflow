@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1920px; height: 1080px; overflow: hidden;
+  background: #0A0A0A; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #fff;
+}
+
+/* ===== DOT GRID BACKGROUND ===== */
+.dot-grid {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: radial-gradient(circle, rgba(0,245,255,0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+/* ===== SCENE CONTAINERS ===== */
+.scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 1; }
+.scene.active { opacity: 1; }
+
+/* ===== LOTTIE CONTAINERS ===== */
+.lottie-container {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+}
+.lottie-container svg { background: transparent !important; }
+.lottie-container svg rect[fill="#ffffff"],
+.lottie-container svg rect[fill="#FFFFFF"],
+.lottie-container svg rect[fill="rgb(255,255,255)"],
+.lottie-container svg path[fill="#ffffff"],
+.lottie-container svg path[fill="#FFFFFF"] { fill: transparent !important; }
+/* cute-monster raster workaround no longer needed */
+.lottie-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(30px);
+  z-index: -1;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== SCENE 1: BRAIN DUMP INTRO ===== */
+#scene1 .title {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 180px; font-weight: 800; letter-spacing: -4px;
+  text-shadow: 0 0 60px rgba(0,245,255,0.5), 0 0 120px rgba(0,245,255,0.2);
+  opacity: 0;
+  white-space: nowrap;
+}
+#scene1 .title .brain { color: #fff; }
+#scene1 .title .dump { color: #00F5FF; }
+
+#scene1 .subtitle {
+  position: absolute; top: calc(50% + 110px); left: 50%; transform: translateX(-50%);
+  font-size: 52px; font-weight: 300; color: rgba(255,255,255,0.7);
+  letter-spacing: 2px; opacity: 0;
+  white-space: nowrap;
+}
+
+#scene1 .accent-line {
+  position: absolute; top: calc(50% + 80px); left: 50%; transform: translateX(-50%);
+  width: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, #00F5FF, #FF00FF, transparent);
+  box-shadow: 0 0 20px #00F5FF, 0 0 40px rgba(0,245,255,0.3);
+}
+
+#scene1 .glow-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0;
+}
+#scene1 .glow-orb.cyan { 
+  width: 400px; height: 400px; background: rgba(0,245,255,0.15);
+  top: 20%; left: 20%;
+}
+#scene1 .glow-orb.magenta {
+  width: 300px; height: 300px; background: rgba(255,0,255,0.1);
+  top: 50%; right: 15%;
+}
+
+/* Scene 1 Lottie: cute monster */
+#lottie-cute-monster {
+  width: 250px; height: 250px;
+  top: calc(50% - 160px); left: calc(50% + 340px);
+}
+#lottie-cute-monster .lottie-glow {
+  width: 150px; height: 150px;
+  background: rgba(0,245,255,0.2);
+}
+
+/* ===== SCENE 2: WORKFLOW PIPELINE ===== */
+#scene2 .pipeline-title {
+  position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+  font-size: 72px; font-weight: 700; letter-spacing: 1px; opacity: 0;
+  text-shadow: 0 0 30px rgba(0,245,255,0.4);
+}
+
+.pipeline-container {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 0;
+}
+
+.pipeline-node {
+  width: 280px; height: 170px; border-radius: 24px;
+  background: rgba(0,245,255,0.08);
+  border: 1.5px solid rgba(0,245,255,0.3);
+  backdrop-filter: blur(20px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; opacity: 0; transform: translateY(60px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05);
+}
+.pipeline-node .icon { width: 72px; height: 72px; margin-bottom: 12px; }
+.pipeline-node .icon svg { width: 72px; height: 72px; }
+.pipeline-node .label { font-size: 26px; font-weight: 600; letter-spacing: 0.5px; }
+
+.pipeline-node.final {
+  background: rgba(57,255,20,0.08);
+  border-color: rgba(57,255,20,0.4);
+  box-shadow: 0 0 30px rgba(57,255,20,0.15), inset 0 0 30px rgba(57,255,20,0.05);
+}
+.pipeline-node.final .icon { color: #39FF14; }
+.pipeline-node.final .label { color: #39FF14; }
+
+.pipeline-arrow {
+  width: 80px; height: 4px; position: relative; margin: 0 8px;
+  opacity: 0;
+}
+.pipeline-arrow .line {
+  width: 0; height: 100%;
+  background: linear-gradient(90deg, #FF00FF, #00F5FF);
+  box-shadow: 0 0 10px rgba(255,0,255,0.5);
+  position: absolute; top: 0; left: 0;
+}
+.pipeline-arrow .head {
+  position: absolute; right: -8px; top: -5px;
+  width: 0; height: 0;
+  border-left: 10px solid #00F5FF;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  opacity: 0;
+  filter: drop-shadow(0 0 5px #00F5FF);
+}
+
+/* Scene 2 Lottie monsters */
+#lottie-alien {
+  width: 120px; height: 120px;
+}
+#lottie-alien .lottie-glow {
+  width: 80px; height: 80px;
+  background: rgba(57,255,20,0.15);
+}
+#lottie-crab {
+  width: 110px; height: 110px;
+}
+#lottie-crab .lottie-glow {
+  width: 70px; height: 70px;
+  background: rgba(255,0,255,0.15);
+}
+#lottie-robot {
+  width: 130px; height: 130px;
+}
+#lottie-robot .lottie-glow {
+  width: 90px; height: 90px;
+  background: rgba(57,255,20,0.2);
+}
+
+/* ===== SCENE 3: BEFORE / AFTER ===== */
+#scene3 .section-title {
+  position: absolute; top: 60px; font-size: 64px; font-weight: 700; opacity: 0;
+}
+#scene3 .before-title { left: 25%; transform: translateX(-50%); color: #FF00FF;
+  text-shadow: 0 0 30px rgba(255,0,255,0.4); }
+#scene3 .after-title { left: 75%; transform: translateX(-50%); color: #39FF14;
+  text-shadow: 0 0 30px rgba(57,255,20,0.4); }
+
+#scene3 .divider {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 2px; height: 0;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.chaos-text {
+  position: absolute; font-size: 34px; opacity: 0; font-weight: 500;
+  color: rgba(255,255,255,0.6);
+}
+
+.ordered-file {
+  position: absolute; width: 480px; height: 80px; border-radius: 14px;
+  background: rgba(57,255,20,0.06); border: 1px solid rgba(57,255,20,0.2);
+  display: flex; align-items: center; padding: 0 20px; gap: 15px;
+  opacity: 0; transform: translateX(40px);
+  box-shadow: 0 0 20px rgba(57,255,20,0.08);
+}
+.ordered-file .file-icon { font-size: 38px; }
+.ordered-file .file-info .file-name { font-size: 22px; font-weight: 600; }
+.ordered-file .file-info .file-date { font-size: 17px; color: rgba(255,255,255,0.4); }
+
+/* Scene 3 Lottie monsters */
+#lottie-confused {
+  width: 180px; height: 180px;
+}
+#lottie-confused .lottie-glow {
+  width: 100px; height: 100px;
+  background: rgba(255,0,255,0.15);
+}
+#lottie-happy-group {
+  width: 200px; height: 200px;
+}
+#lottie-happy-group .lottie-glow {
+  width: 120px; height: 120px;
+  background: rgba(57,255,20,0.15);
+}
+</style>
+</head>
+<body>
+<div class="dot-grid"></div>
+
+<!-- SCENE 1: Brain Dump Intro -->
+<div class="scene" id="scene1">
+  <div class="glow-orb cyan"></div>
+  <div class="glow-orb magenta"></div>
+  <div class="title"><span class="brain">Brain </span><span class="dump">Dump</span></div>
+  <div class="accent-line"></div>
+  <div class="subtitle">Capture ideas in 10 seconds</div>
+  <!-- Lottie: cute monster bouncing in from right of title -->
+  <div class="lottie-container" id="lottie-cute-monster">
+    <div class="lottie-glow"></div>
+  </div>
+</div>
+
+<!-- SCENE 2: Workflow Pipeline -->
+<div class="scene" id="scene2">
+  <div class="pipeline-title">How It <span style="color:#00F5FF">Works</span></div>
+  <div class="pipeline-container">
+    <div class="pipeline-node" id="node1">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><div class="label">Voice</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow1"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node2">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="label">Dictate</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow2"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node3">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div><div class="label">Format Date</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow3"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node4">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div><div class="label">Save</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow4"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node final" id="node5">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg></div><div class="label">.md File</div>
+    </div>
+  </div>
+  <!-- Lottie monsters peeking from pipeline nodes -->
+  <div class="lottie-container" id="lottie-alien"><div class="lottie-glow"></div></div>
+  <div class="lottie-container" id="lottie-crab"><div class="lottie-glow"></div></div>
+  <div class="lottie-container" id="lottie-robot"><div class="lottie-glow"></div></div>
+</div>
+
+<!-- SCENE 3: Before/After -->
+<div class="scene" id="scene3">
+  <div class="section-title before-title">Before</div>
+  <div class="section-title after-title">After</div>
+  <div class="divider"></div>
+  
+  <!-- Chaos side -->
+  <div class="chaos-text" id="ct1" style="left:80px;top:220px;font-size:36px;transform:rotate(-8deg)">💭 shower idea...</div>
+  <div class="chaos-text" id="ct2" style="left:200px;top:380px;font-size:32px;transform:rotate(5deg)">🚗 car thought</div>
+  <div class="chaos-text" id="ct3" style="left:50px;top:500px;font-size:38px;transform:rotate(-3deg)">🌙 3am insight!</div>
+  <div class="chaos-text" id="ct4" style="left:280px;top:300px;font-size:30px;transform:rotate(12deg)">📱 quick note?</div>
+  <div class="chaos-text" id="ct5" style="left:120px;top:640px;font-size:34px;transform:rotate(-6deg)">💡 billion $ idea</div>
+  <div class="chaos-text" id="ct6" style="left:320px;top:580px;font-size:30px;transform:rotate(8deg)">🤔 what was it...</div>
+  <div class="chaos-text" id="ct7" style="left:60px;top:780px;font-size:32px;transform:rotate(-10deg)">😤 forgot again</div>
+  
+  <!-- Ordered side -->
+  <div class="ordered-file" id="f1" style="left:1020px;top:200px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-13.md</div><div class="file-date">April 13, 2025 • 8:42 AM</div></div>
+  </div>
+  <div class="ordered-file" id="f2" style="left:1020px;top:320px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-12.md</div><div class="file-date">April 12, 2025 • 3:15 PM</div></div>
+  </div>
+  <div class="ordered-file" id="f3" style="left:1020px;top:440px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-11.md</div><div class="file-date">April 11, 2025 • 11:20 AM</div></div>
+  </div>
+  <div class="ordered-file" id="f4" style="left:1020px;top:560px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-10.md</div><div class="file-date">April 10, 2025 • 7:00 PM</div></div>
+  </div>
+  <div class="ordered-file" id="f5" style="left:1020px;top:680px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-09.md</div><div class="file-date">April 9, 2025 • 9:30 AM</div></div>
+  </div>
+
+  <!-- Lottie: confused monster on chaos side, happy group on ordered side -->
+  <div class="lottie-container" id="lottie-confused"><div class="lottie-glow"></div></div>
+  <div class="lottie-container" id="lottie-happy-group"><div class="lottie-glow"></div></div>
+</div>
+
+<script>
+// ===== LOTTIE ANIMATION SETUP =====
+const lottiePath = '../../assets/lottie/monsters/';
+
+const lottieAnims = {};
+
+function removeWhiteBg(container) {
+  // Remove white/default background rectangles that Lottie embeds
+  const svgs = container.querySelectorAll('svg');
+  svgs.forEach(svg => {
+    svg.style.background = 'transparent';
+    const rects = svg.querySelectorAll('rect');
+    rects.forEach(rect => {
+      const fill = rect.getAttribute('fill');
+      const w = parseFloat(rect.getAttribute('width') || 0);
+      const h = parseFloat(rect.getAttribute('height') || 0);
+      // Remove large background rects (white, black, or default fill)
+      if (w > 100 && h > 100) {
+        if (!fill || fill === '#ffffff' || fill === '#FFFFFF' || fill === 'rgb(255,255,255)' || fill === 'white' || fill === 'rgb(0,0,0)' || fill === '#000000' || fill === 'black') {
+          rect.setAttribute('fill', 'transparent');
+          rect.setAttribute('fill-opacity', '0');
+        }
+      }
+    });
+  });
+}
+
+function initLottie(id, filename) {
+  const container = document.getElementById(id);
+  if (!container) return null;
+  const anim = lottie.loadAnimation({
+    container: container,
+    renderer: 'svg',
+    loop: false,
+    autoplay: false,
+    path: lottiePath + filename
+  });
+  anim.addEventListener('DOMLoaded', () => {
+    removeWhiteBg(container);
+    // Re-check after first frame render
+    setTimeout(() => removeWhiteBg(container), 100);
+  });
+  lottieAnims[id] = anim;
+  return anim;
+}
+
+// Initialize all Lottie animations
+initLottie('lottie-cute-monster', 'monster-one.json');
+initLottie('lottie-alien', 'one-eye-alien.json');
+initLottie('lottie-crab', 'monster-2.json');
+initLottie('lottie-robot', 'robot-character-robot.json');
+initLottie('lottie-confused', 'monster-creature.json');
+initLottie('lottie-happy-group', 'monsters-group.json');
+
+// Helper: set lottie frame based on normalized progress (0-1)
+function setLottieProgress(id, progress) {
+  const anim = lottieAnims[id];
+  if (!anim || !anim.totalFrames) return;
+  const loopProgress = progress % 1;
+  const lottieFrame = Math.floor(loopProgress * (anim.totalFrames - 1));
+  anim.goToAndStop(lottieFrame, true);
+  // Remove white bg after each frame render
+  const container = document.getElementById(id);
+  if (container) removeWhiteBg(container);
+}
+
+// ===== MAIN ANIMATION CONTROLLER =====
+const FPS = 30;
+const TOTAL_SECONDS = 20;
+const TOTAL_FRAMES = FPS * TOTAL_SECONDS;
+
+const SCENE1_START = 0;
+const SCENE1_END = 5 * FPS;
+const SCENE2_START = 5 * FPS;
+const SCENE2_END = 13 * FPS;
+const SCENE3_START = 13 * FPS;
+const SCENE3_END = 20 * FPS;
+
+function setFrame(frame) {
+  const t = frame / FPS;
+  
+  document.body.className = '';
+  
+  // ===== SCENE 1 =====
+  if (frame >= SCENE1_START && frame < SCENE1_END) {
+    const st = t;
+    const scene = document.getElementById('scene1');
+    scene.style.opacity = '1';
+    
+    if (st > 4.2) {
+      scene.style.opacity = String(Math.max(0, 1 - (st - 4.2) / 0.8));
+    }
+    
+    // Glow orbs
+    const orbs = scene.querySelectorAll('.glow-orb');
+    orbs.forEach(o => { o.style.opacity = String(Math.min(1, st / 1)); });
+    
+    // Title spring animation
+    const title = scene.querySelector('.title');
+    if (st < 0.3) {
+      title.style.opacity = '0';
+      title.style.transform = 'translate(-50%, -50%) scale(0.3)';
+    } else {
+      const tt = Math.min(1, (st - 0.3) / 0.8);
+      const spring = 1 + Math.sin(tt * Math.PI * 2.5) * (1 - tt) * 0.15;
+      const scale = 0.3 + (1 - 0.3) * easeOutCubic(tt) * spring;
+      title.style.opacity = String(Math.min(1, tt * 3));
+      title.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+    
+    // Accent line
+    const line = scene.querySelector('.accent-line');
+    if (st < 1.2) {
+      line.style.width = '0px';
+    } else {
+      const lt = Math.min(1, (st - 1.2) / 0.8);
+      line.style.width = `${easeOutCubic(lt) * 500}px`;
+    }
+    
+    // Subtitle
+    const sub = scene.querySelector('.subtitle');
+    if (st < 1.8) {
+      sub.style.opacity = '0';
+      sub.style.transform = 'translateX(-50%) translateY(20px)';
+    } else {
+      const subt = Math.min(1, (st - 1.8) / 0.8);
+      sub.style.opacity = String(easeOutCubic(subt));
+      sub.style.transform = `translateX(-50%) translateY(${20 * (1 - easeOutCubic(subt))}px)`;
+    }
+    
+    // ===== LOTTIE: Cute monster bouncing in from right =====
+    const cuteMonster = document.getElementById('lottie-cute-monster');
+    if (st < 1.0) {
+      cuteMonster.style.opacity = '0';
+      cuteMonster.style.transform = 'translateX(200px) scale(0.3)';
+    } else if (st < 4.2) {
+      const mt = Math.min(1, (st - 1.0) / 0.8);
+      // Spring bounce entrance
+      const mSpring = 1 + Math.sin(mt * Math.PI * 3) * (1 - mt) * 0.25;
+      const mScale = 0.3 + 0.7 * easeOutCubic(mt) * mSpring;
+      const mX = 200 * (1 - easeOutCubic(mt));
+      cuteMonster.style.opacity = String(Math.min(1, mt * 2));
+      cuteMonster.style.transform = `translateX(${mX}px) scale(${mScale})`;
+      // Lottie playback: loop through animation over scene time
+      const lottieProgress = (st - 1.0) / 3.0;
+      setLottieProgress('lottie-cute-monster', lottieProgress);
+    } else {
+      // Fade out with scene
+      const fadeOut = Math.max(0, 1 - (st - 4.2) / 0.8);
+      cuteMonster.style.opacity = String(fadeOut);
+      cuteMonster.style.transform = 'translateX(0px) scale(1)';
+      setLottieProgress('lottie-cute-monster', 1.0);
+    }
+    
+    // Hide scene 2/3 lotties
+    document.getElementById('lottie-alien').style.opacity = '0';
+    document.getElementById('lottie-crab').style.opacity = '0';
+    document.getElementById('lottie-robot').style.opacity = '0';
+    document.getElementById('lottie-confused').style.opacity = '0';
+    document.getElementById('lottie-happy-group').style.opacity = '0';
+    
+  } else {
+    document.getElementById('scene1').style.opacity = '0';
+    document.getElementById('lottie-cute-monster').style.opacity = '0';
+  }
+  
+  // ===== SCENE 2 =====
+  if (frame >= SCENE2_START && frame < SCENE2_END) {
+    const st = t - 5;
+    const scene = document.getElementById('scene2');
+    
+    let sceneOpacity = Math.min(1, st / 0.5);
+    if (st > 7) sceneOpacity = Math.max(0, 1 - (st - 7) / 1);
+    scene.style.opacity = String(sceneOpacity);
+    
+    const ptitle = scene.querySelector('.pipeline-title');
+    ptitle.style.opacity = String(Math.min(1, st / 0.5));
+    
+    const nodes = scene.querySelectorAll('.pipeline-node');
+    const arrows = scene.querySelectorAll('.pipeline-arrow');
+    
+    // We need node positions for placing lotties
+    // node1=Voice(idx0), node4=Save(idx3), node5=.md File(idx4)
+    
+    for (let i = 0; i < nodes.length; i++) {
+      const nodeStart = 0.5 + i * 0.8;
+      const nt = Math.max(0, Math.min(1, (st - nodeStart) / 0.6));
+      
+      if (nt <= 0) {
+        nodes[i].style.opacity = '0';
+        nodes[i].style.transform = 'translateY(60px)';
+      } else {
+        const spring = 1 + Math.sin(nt * Math.PI * 2) * (1 - nt) * 0.2;
+        const y = 60 * (1 - easeOutCubic(nt));
+        nodes[i].style.opacity = String(Math.min(1, nt * 2));
+        nodes[i].style.transform = `translateY(${y}px) scale(${0.8 + 0.2 * spring})`;
+        
+        if (nt > 0.5) {
+          const glowPhase = Math.sin((st - nodeStart) * 3) * 0.5 + 0.5;
+          const glowSize = 30 + glowPhase * 20;
+          if (nodes[i].classList.contains('final')) {
+            nodes[i].style.boxShadow = `0 0 ${glowSize}px rgba(57,255,20,${0.1 + glowPhase * 0.15}), inset 0 0 30px rgba(57,255,20,0.05)`;
+          } else {
+            nodes[i].style.boxShadow = `0 0 ${glowSize}px rgba(0,245,255,${0.1 + glowPhase * 0.15}), inset 0 0 30px rgba(0,245,255,0.05)`;
+          }
+        }
+      }
+      
+      if (i < arrows.length) {
+        const arrowStart = nodeStart + 0.4;
+        const at = Math.max(0, Math.min(1, (st - arrowStart) / 0.4));
+        arrows[i].style.opacity = at > 0 ? '1' : '0';
+        const aLine = arrows[i].querySelector('.line');
+        const aHead = arrows[i].querySelector('.head');
+        aLine.style.width = `${easeOutCubic(at) * 100}%`;
+        aHead.style.opacity = at > 0.8 ? '1' : '0';
+      }
+    }
+    
+    // ===== LOTTIE: Pipeline helper monsters =====
+    // Position them relative to their nodes using getBoundingClientRect
+    positionPipelineMonsters(st, sceneOpacity);
+    
+    // Hide other scene lotties
+    document.getElementById('lottie-cute-monster').style.opacity = '0';
+    document.getElementById('lottie-confused').style.opacity = '0';
+    document.getElementById('lottie-happy-group').style.opacity = '0';
+    
+  } else {
+    document.getElementById('scene2').style.opacity = '0';
+    document.getElementById('lottie-alien').style.opacity = '0';
+    document.getElementById('lottie-crab').style.opacity = '0';
+    document.getElementById('lottie-robot').style.opacity = '0';
+  }
+  
+  // ===== SCENE 3 =====
+  if (frame >= SCENE3_START && frame <= SCENE3_END) {
+    const st = t - 13;
+    const scene = document.getElementById('scene3');
+    
+    let sceneOpacity = Math.min(1, st / 0.5);
+    scene.style.opacity = String(sceneOpacity);
+    
+    const beforeTitle = scene.querySelector('.before-title');
+    const afterTitle = scene.querySelector('.after-title');
+    beforeTitle.style.opacity = String(Math.min(1, st / 0.5));
+    afterTitle.style.opacity = String(Math.min(1, Math.max(0, (st - 0.3) / 0.5)));
+    
+    const divider = scene.querySelector('.divider');
+    const divH = Math.min(1, Math.max(0, st / 0.8));
+    divider.style.height = `${divH * 80}%`;
+    
+    // Chaos texts
+    const chaosTexts = document.querySelectorAll('.chaos-text');
+    chaosTexts.forEach((ct, i) => {
+      const ctStart = 0.3 + i * 0.15;
+      const ctt = Math.max(0, Math.min(1, (st - ctStart) / 0.4));
+      ct.style.opacity = String(ctt * 0.7);
+      
+      if (ctt > 0) {
+        const floatX = Math.sin((st + i * 1.5) * 1.5) * 12;
+        const floatY = Math.cos((st + i * 2) * 1.2) * 10;
+        const rot = Math.sin((st + i) * 0.8) * 5;
+        ct.style.transform = `translate(${floatX}px, ${floatY}px) rotate(${rot}deg)`;
+      }
+    });
+    
+    // Ordered files
+    const files = document.querySelectorAll('.ordered-file');
+    files.forEach((f, i) => {
+      const fStart = 1.5 + i * 0.3;
+      const ft = Math.max(0, Math.min(1, (st - fStart) / 0.5));
+      f.style.opacity = String(easeOutCubic(ft));
+      f.style.transform = `translateX(${40 * (1 - easeOutCubic(ft))}px)`;
+      
+      if (ft > 0.5) {
+        const gp = Math.sin((st - fStart) * 2) * 0.5 + 0.5;
+        f.style.boxShadow = `0 0 ${20 + gp * 15}px rgba(57,255,20,${0.08 + gp * 0.07})`;
+      }
+    });
+    
+    // ===== LOTTIE: Scene 3 monsters =====
+    // Confused monster on the Before (chaos) side
+    const confused = document.getElementById('lottie-confused');
+    const confusedStart = 0.8;
+    if (st < confusedStart) {
+      confused.style.opacity = '0';
+    } else {
+      const ct = Math.min(1, (st - confusedStart) / 0.6);
+      confused.style.opacity = String(Math.min(0.85, ct) * sceneOpacity);
+      // Float among the chaos
+      const bobX = Math.sin(st * 1.2) * 15;
+      const bobY = Math.cos(st * 0.9) * 12;
+      const bobRot = Math.sin(st * 0.7) * 8;
+      confused.style.left = `${200 + bobX}px`;
+      confused.style.top = `${700 + bobY}px`;
+      confused.style.transform = `rotate(${bobRot}deg) scale(${0.5 + 0.5 * easeOutCubic(ct)})`;
+      // Lottie playback
+      const lp = (st - confusedStart) / 5.0;
+      setLottieProgress('lottie-confused', lp);
+    }
+    
+    // Happy group on the After (ordered) side
+    const happyGroup = document.getElementById('lottie-happy-group');
+    const happyStart = 2.5;
+    if (st < happyStart) {
+      happyGroup.style.opacity = '0';
+    } else {
+      const ht = Math.min(1, (st - happyStart) / 0.6);
+      happyGroup.style.opacity = String(Math.min(0.85, ht) * sceneOpacity);
+      happyGroup.style.left = '1320px';
+      happyGroup.style.top = '800px';
+      // Gentle bob
+      const hBob = Math.sin(st * 1.5) * 5;
+      happyGroup.style.transform = `translateY(${hBob}px) scale(${0.4 + 0.6 * easeOutCubic(ht)})`;
+      const lp = (st - happyStart) / 4.0;
+      setLottieProgress('lottie-happy-group', lp);
+    }
+    
+    // Hide other lotties
+    document.getElementById('lottie-cute-monster').style.opacity = '0';
+    document.getElementById('lottie-alien').style.opacity = '0';
+    document.getElementById('lottie-crab').style.opacity = '0';
+    document.getElementById('lottie-robot').style.opacity = '0';
+    
+  } else {
+    document.getElementById('scene3').style.opacity = '0';
+    document.getElementById('lottie-confused').style.opacity = '0';
+    document.getElementById('lottie-happy-group').style.opacity = '0';
+  }
+}
+
+function positionPipelineMonsters(st, sceneOpacity) {
+  const node1 = document.getElementById('node1'); // Voice
+  const node4 = document.getElementById('node4'); // Save
+  const node5 = document.getElementById('node5'); // .md File
+  
+  const alien = document.getElementById('lottie-alien');
+  const crab = document.getElementById('lottie-crab');
+  const robot = document.getElementById('lottie-robot');
+  
+  // Get node positions
+  const r1 = node1.getBoundingClientRect();
+  const r4 = node4.getBoundingClientRect();
+  const r5 = node5.getBoundingClientRect();
+  
+  // Alien peeks from top-right of Voice node
+  const alienStart = 1.5;
+  if (st < alienStart) {
+    alien.style.opacity = '0';
+  } else {
+    const at = Math.min(1, (st - alienStart) / 0.5);
+    alien.style.opacity = String(Math.min(0.9, at) * sceneOpacity);
+    alien.style.left = `${r1.right - 30}px`;
+    alien.style.top = `${r1.top - 80}px`;
+    // Pop up from behind node
+    const popY = 30 * (1 - easeOutCubic(at));
+    const wobble = Math.sin(st * 3) * 3;
+    alien.style.transform = `translateY(${popY}px) rotate(${wobble}deg) scale(${0.5 + 0.5 * easeOutCubic(at)})`;
+    setLottieProgress('lottie-alien', (st - alienStart) / 5.0);
+  }
+  
+  // Crab at Save node
+  const crabStart = 3.0;
+  if (st < crabStart) {
+    crab.style.opacity = '0';
+  } else {
+    const ct = Math.min(1, (st - crabStart) / 0.5);
+    crab.style.opacity = String(Math.min(0.9, ct) * sceneOpacity);
+    crab.style.left = `${r4.right - 25}px`;
+    crab.style.top = `${r4.top - 70}px`;
+    const popY = 25 * (1 - easeOutCubic(ct));
+    const wobble = Math.sin(st * 2.5) * 4;
+    crab.style.transform = `translateY(${popY}px) rotate(${wobble}deg) scale(${0.5 + 0.5 * easeOutCubic(ct)})`;
+    setLottieProgress('lottie-crab', (st - crabStart) / 4.0);
+  }
+  
+  // Robot at .md File node
+  const robotStart = 4.0;
+  if (st < robotStart) {
+    robot.style.opacity = '0';
+  } else {
+    const rt = Math.min(1, (st - robotStart) / 0.5);
+    robot.style.opacity = String(Math.min(0.9, rt) * sceneOpacity);
+    robot.style.left = `${r5.right - 30}px`;
+    robot.style.top = `${r5.top - 90}px`;
+    const popY = 35 * (1 - easeOutCubic(rt));
+    const wobble = Math.sin(st * 2) * 3;
+    robot.style.transform = `translateY(${popY}px) rotate(${wobble}deg) scale(${0.5 + 0.5 * easeOutCubic(rt)})`;
+    setLottieProgress('lottie-robot', (st - robotStart) / 3.5);
+  }
+}
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+// Expose for puppeteer
+window.setFrame = setFrame;
+window.TOTAL_FRAMES = TOTAL_FRAMES;
+window.FPS = FPS;
+
+// Auto-play for preview
+let currentFrame = 0;
+function animate() {
+  setFrame(currentFrame);
+  currentFrame++;
+  if (currentFrame <= TOTAL_FRAMES) requestAnimationFrame(animate);
+}
+// Don't auto-play when puppeteer controls it
+if (!window.__PUPPETEER__) {
+  // Wait a beat for lotties to load
+  setTimeout(animate, 1000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1920px; height: 1080px; overflow: hidden;
+  background: #0A0A0A; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #fff;
+}
+
+/* ===== DOT GRID BACKGROUND ===== */
+.dot-grid {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: radial-gradient(circle, rgba(0,245,255,0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+/* ===== SCENE CONTAINERS ===== */
+.scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 1; }
+
+/* ===== SCENE 1: BRAIN DUMP INTRO ===== */
+#scene1 .title {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 180px; font-weight: 800; letter-spacing: -4px;
+  text-shadow: 0 0 60px rgba(0,245,255,0.5), 0 0 120px rgba(0,245,255,0.2);
+  opacity: 0; white-space: nowrap;
+}
+#scene1 .title .brain { color: #fff; }
+#scene1 .title .dump { color: #00F5FF; }
+
+#scene1 .subtitle {
+  position: absolute; top: calc(50% + 110px); left: 50%; transform: translateX(-50%);
+  font-size: 52px; font-weight: 300; color: rgba(255,255,255,0.7);
+  letter-spacing: 2px; opacity: 0; white-space: nowrap;
+}
+
+#scene1 .accent-line {
+  position: absolute; top: calc(50% + 80px); left: 50%; transform: translateX(-50%);
+  width: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, #00F5FF, #FF00FF, transparent);
+  box-shadow: 0 0 20px #00F5FF, 0 0 40px rgba(0,245,255,0.3);
+}
+
+#scene1 .glow-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0;
+}
+#scene1 .glow-orb.cyan {
+  width: 400px; height: 400px; background: rgba(0,245,255,0.15);
+  top: 20%; left: 20%;
+}
+#scene1 .glow-orb.magenta {
+  width: 300px; height: 300px; background: rgba(255,0,255,0.1);
+  top: 50%; right: 15%;
+}
+
+/* ===== SCENE 2: THE SHORTCUT ===== */
+#scene2 .scene-title {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+  font-size: 72px; font-weight: 700; letter-spacing: 1px; opacity: 0;
+  text-shadow: 0 0 30px rgba(0,245,255,0.4);
+  white-space: nowrap;
+}
+
+.phone-mockup {
+  position: absolute;
+  width: 360px; height: 780px;
+  background: #1a1a2e;
+  border: 3px solid rgba(0,245,255,0.5);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,245,255,0.15), 0 0 60px rgba(0,245,255,0.05);
+}
+.phone-mockup::before {
+  content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 100px; height: 24px; background: #0A0A0A; border-radius: 12px; z-index: 10;
+}
+.phone-mockup img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.phone-label {
+  position: absolute;
+  font-size: 32px; font-weight: 600; color: #00F5FF;
+  text-align: center; white-space: nowrap;
+  text-shadow: 0 0 15px rgba(0,245,255,0.4);
+}
+
+/* ===== SCENE 3: HOW IT WORKS ===== */
+#scene3 .scene-title {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+  font-size: 72px; font-weight: 700; letter-spacing: 1px; opacity: 0;
+  text-shadow: 0 0 30px rgba(0,245,255,0.4);
+  white-space: nowrap;
+}
+
+.pipeline-container {
+  position: absolute; top: 50%; left: 40%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 0;
+}
+
+.pipeline-node {
+  width: 180px; height: 120px; border-radius: 24px;
+  background: rgba(0,245,255,0.08);
+  border: 1.5px solid rgba(0,245,255,0.3);
+  backdrop-filter: blur(20px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; opacity: 0; transform: translateY(60px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05);
+}
+.pipeline-node .icon { width: 56px; height: 56px; margin-bottom: 8px; }
+.pipeline-node .icon svg { width: 56px; height: 56px; }
+.pipeline-node .label { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+
+.pipeline-node.final {
+  background: rgba(57,255,20,0.08);
+  border-color: rgba(57,255,20,0.4);
+  box-shadow: 0 0 30px rgba(57,255,20,0.15), inset 0 0 30px rgba(57,255,20,0.05);
+}
+.pipeline-node.final .icon { color: #39FF14; }
+.pipeline-node.final .label { color: #39FF14; }
+
+.pipeline-arrow {
+  width: 50px; height: 4px; position: relative; margin: 0 4px;
+  opacity: 0;
+}
+.pipeline-arrow .line {
+  width: 0; height: 100%;
+  background: linear-gradient(90deg, #FF00FF, #00F5FF);
+  box-shadow: 0 0 10px rgba(255,0,255,0.5);
+  position: absolute; top: 0; left: 0;
+}
+.pipeline-arrow .head {
+  position: absolute; right: -8px; top: -5px;
+  width: 0; height: 0;
+  border-left: 10px solid #00F5FF;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  opacity: 0;
+  filter: drop-shadow(0 0 5px #00F5FF);
+}
+
+.checkmark-overlay {
+  position: absolute; top: 8px; right: 8px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(57,255,20,0.2);
+  border: 2px solid #39FF14;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  box-shadow: 0 0 12px rgba(57,255,20,0.4);
+}
+.checkmark-overlay svg { width: 18px; height: 18px; }
+
+.screenshot-panel {
+  position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+  width: 360px; height: 780px;
+  background: #1a1a2e;
+  border: 3px solid rgba(0,245,255,0.5);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,245,255,0.25), 0 0 80px rgba(0,245,255,0.1);
+  opacity: 0;
+}
+.screenshot-panel::before {
+  content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 100px; height: 24px; background: #0A0A0A; border-radius: 12px; z-index: 10;
+}
+.screenshot-panel img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.screenshot-panel-label {
+  position: absolute; right: 40px; top: calc(50% + 410px);
+  font-size: 28px; font-weight: 600; color: #00F5FF;
+  text-align: center; width: 360px; opacity: 0;
+  text-shadow: 0 0 15px rgba(0,245,255,0.4);
+}
+
+/* ===== SCENE 4: BEFORE/AFTER ===== */
+#scene4 .section-title {
+  position: absolute; top: 60px; font-size: 64px; font-weight: 700; opacity: 0;
+}
+#scene4 .before-title { left: 25%; transform: translateX(-50%); color: #FF00FF;
+  text-shadow: 0 0 30px rgba(255,0,255,0.4); }
+#scene4 .after-title { left: 75%; transform: translateX(-50%); color: #39FF14;
+  text-shadow: 0 0 30px rgba(57,255,20,0.4); }
+
+#scene4 .divider {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 2px; height: 0;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.chaos-text {
+  position: absolute; font-size: 34px; opacity: 0; font-weight: 500;
+  color: rgba(255,255,255,0.6);
+}
+
+.ordered-file {
+  position: absolute; width: 400px; height: 70px; border-radius: 14px;
+  background: rgba(57,255,20,0.06); border: 1px solid rgba(57,255,20,0.2);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px;
+  opacity: 0; transform: translateX(40px);
+  box-shadow: 0 0 20px rgba(57,255,20,0.08);
+}
+.ordered-file .file-icon { font-size: 32px; }
+.ordered-file .file-info .file-name { font-size: 19px; font-weight: 600; }
+.ordered-file .file-info .file-date { font-size: 15px; color: rgba(255,255,255,0.4); }
+
+.result-phone {
+  position: absolute;
+  width: 360px; height: 780px;
+  background: #1a1a2e;
+  border: 3px solid rgba(57,255,20,0.5);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(57,255,20,0.15), 0 0 60px rgba(57,255,20,0.05);
+  opacity: 0;
+}
+.result-phone::before {
+  content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 100px; height: 24px; background: #0A0A0A; border-radius: 12px; z-index: 10;
+}
+.result-phone img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.result-phone-label {
+  position: absolute;
+  font-size: 32px; font-weight: 600; color: #39FF14;
+  text-align: center; white-space: nowrap; opacity: 0;
+  text-shadow: 0 0 15px rgba(57,255,20,0.4);
+}
+</style>
+</head>
+<body>
+<div class="dot-grid"></div>
+
+<!-- Preload images -->
+<img id="img01" src="../../assets/screenshots/01-spotlight-search.jpg" style="display:none">
+<img id="img04" src="../../assets/screenshots/04-editor-dictate-date.jpg" style="display:none">
+<img id="img05" src="../../assets/screenshots/05-editor-save-notify.jpg" style="display:none">
+<img id="img06" src="../../assets/screenshots/06-files-result.jpg" style="display:none">
+
+<!-- SCENE 1: Brain Dump Intro -->
+<div class="scene" id="scene1">
+  <div class="glow-orb cyan"></div>
+  <div class="glow-orb magenta"></div>
+  <div class="title"><span class="brain">Brain </span><span class="dump">Dump</span></div>
+  <div class="accent-line"></div>
+  <div class="subtitle">Capture ideas in 10 seconds</div>
+</div>
+
+<!-- SCENE 2: The Shortcut -->
+<div class="scene" id="scene2">
+  <div class="scene-title" style="top:30px">The <span style="color:#00F5FF">Shortcut</span></div>
+
+  <!-- Phone 1: Spotlight search -->
+  <div class="phone-mockup" id="phone1" style="left: 140px; top: 120px; opacity: 0;">
+    <img src="../../assets/screenshots/01-spotlight-search.jpg" alt="Spotlight Search">
+  </div>
+  <div class="phone-label" id="label1" style="left: 320px; top: 920px; transform: translateX(-50%); opacity: 0;">1. Find Shortcuts</div>
+
+  <!-- Phone 2: Editor dictate+date -->
+  <div class="phone-mockup" id="phone2" style="left: 780px; top: 120px; opacity: 0;">
+    <img src="../../assets/screenshots/04-editor-dictate-date.jpg" alt="Editor Dictate Date">
+  </div>
+  <div class="phone-label" id="label2" style="left: 960px; top: 920px; transform: translateX(-50%); opacity: 0;">2. Build the Flow</div>
+
+  <!-- Phone 3: Editor save+notify -->
+  <div class="phone-mockup" id="phone3" style="left: 1420px; top: 120px; opacity: 0;">
+    <img src="../../assets/screenshots/05-editor-save-notify.jpg" alt="Editor Save Notify">
+  </div>
+  <div class="phone-label" id="label3" style="left: 1600px; top: 920px; transform: translateX(-50%); opacity: 0;">3. Save &amp; Notify</div>
+</div>
+
+<!-- SCENE 3: How It Works -->
+<div class="scene" id="scene3">
+  <div class="scene-title" id="scene3title">How It <span style="color:#00F5FF">Works</span></div>
+  <div class="pipeline-container" id="pipeline">
+    <div class="pipeline-node" id="node1">
+      <div class="checkmark-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="3"><polyline points="4 12 10 18 20 6"/></svg></div>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><div class="label">Voice</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow1"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node2">
+      <div class="checkmark-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="3"><polyline points="4 12 10 18 20 6"/></svg></div>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="label">Dictate</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow2"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node3">
+      <div class="checkmark-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="3"><polyline points="4 12 10 18 20 6"/></svg></div>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div><div class="label">Format Date</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow3"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node4">
+      <div class="checkmark-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="3"><polyline points="4 12 10 18 20 6"/></svg></div>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div><div class="label">Save</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow4"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node final" id="node5">
+      <div class="checkmark-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="3"><polyline points="4 12 10 18 20 6"/></svg></div>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg></div><div class="label">.md File</div>
+    </div>
+  </div>
+
+  <!-- Screenshot panel -->
+  <div class="screenshot-panel" id="screenshotPanel">
+    <img src="../../assets/screenshots/04-editor-dictate-date.jpg" alt="Editor">
+  </div>
+  <div class="screenshot-panel-label" id="screenshotPanelLabel">Your shortcut handles all this</div>
+</div>
+
+<!-- SCENE 4: Before/After -->
+<div class="scene" id="scene4">
+  <div class="section-title before-title">Before</div>
+  <div class="section-title after-title">After</div>
+  <div class="divider"></div>
+
+  <!-- Chaos side -->
+  <div class="chaos-text" id="ct1" style="left:80px;top:220px;font-size:36px">💭 shower idea...</div>
+  <div class="chaos-text" id="ct2" style="left:200px;top:380px;font-size:32px">🚗 car thought</div>
+  <div class="chaos-text" id="ct3" style="left:50px;top:500px;font-size:38px">🌙 3am insight!</div>
+  <div class="chaos-text" id="ct4" style="left:280px;top:300px;font-size:30px">📱 quick note?</div>
+  <div class="chaos-text" id="ct5" style="left:120px;top:640px;font-size:34px">💡 billion $ idea</div>
+  <div class="chaos-text" id="ct6" style="left:320px;top:580px;font-size:30px">🤔 what was it...</div>
+  <div class="chaos-text" id="ct7" style="left:60px;top:780px;font-size:32px">😤 forgot again</div>
+
+  <!-- Result phone -->
+  <div class="result-phone" id="resultPhone" style="left:1050px; top:120px;">
+    <img src="../../assets/screenshots/06-files-result.jpg" alt="Files Result">
+  </div>
+  <div class="result-phone-label" id="resultPhoneLabel" style="left:1230px; top:920px; transform: translateX(-50%);">Auto-organized in iCloud</div>
+
+  <!-- Ordered files below phone -->
+  <div class="ordered-file" id="f1" style="left:1020px;top:960px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-13.md</div><div class="file-date">April 13, 2025 • 8:42 AM</div></div>
+  </div>
+  <div class="ordered-file" id="f2" style="left:1020px;top:1050px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-12.md</div><div class="file-date">April 12, 2025 • 3:15 PM</div></div>
+  </div>
+
+</div>
+
+<script>
+const FPS = 30;
+const TOTAL_SECONDS = 25;
+const TOTAL_FRAMES = FPS * TOTAL_SECONDS; // 750
+
+// Scene boundaries in frames
+const SCENE1_START = 0;
+const SCENE1_END = 4 * FPS;      // 0-4s
+const SCENE2_START = 4 * FPS;
+const SCENE2_END = 10 * FPS;     // 4-10s
+const SCENE3_START = 10 * FPS;
+const SCENE3_END = 18 * FPS;     // 10-18s
+const SCENE4_START = 18 * FPS;
+const SCENE4_END = 25 * FPS;     // 18-25s
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function setFrame(frame) {
+  const t = frame / FPS;
+
+  // Hide all scenes by default
+  document.getElementById('scene1').style.opacity = '0';
+  document.getElementById('scene2').style.opacity = '0';
+  document.getElementById('scene3').style.opacity = '0';
+  document.getElementById('scene4').style.opacity = '0';
+
+  // ===== SCENE 1: Title Intro (0-4s) =====
+  if (frame >= SCENE1_START && frame < SCENE1_END) {
+    const st = t;
+    const scene = document.getElementById('scene1');
+    scene.style.opacity = '1';
+
+    // Fade out at 3.5s
+    if (st > 3.5) {
+      scene.style.opacity = String(Math.max(0, 1 - (st - 3.5) / 0.5));
+    }
+
+    // Glow orbs
+    const orbs = scene.querySelectorAll('.glow-orb');
+    orbs.forEach(o => { o.style.opacity = String(Math.min(1, st / 1)); });
+
+    // Title spring animation
+    const title = scene.querySelector('.title');
+    if (st < 0.3) {
+      title.style.opacity = '0';
+      title.style.transform = 'translate(-50%, -50%) scale(0.3)';
+    } else {
+      const tt = Math.min(1, (st - 0.3) / 0.8);
+      const spring = 1 + Math.sin(tt * Math.PI * 2.5) * (1 - tt) * 0.15;
+      const scale = 0.3 + (1 - 0.3) * easeOutCubic(tt) * spring;
+      title.style.opacity = String(Math.min(1, tt * 3));
+      title.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+
+    // Accent line
+    const line = scene.querySelector('.accent-line');
+    if (st < 1.2) {
+      line.style.width = '0px';
+    } else {
+      const lt = Math.min(1, (st - 1.2) / 0.8);
+      line.style.width = `${easeOutCubic(lt) * 500}px`;
+    }
+
+    // Subtitle
+    const sub = scene.querySelector('.subtitle');
+    if (st < 1.8) {
+      sub.style.opacity = '0';
+      sub.style.transform = 'translateX(-50%) translateY(20px)';
+    } else {
+      const subt = Math.min(1, (st - 1.8) / 0.8);
+      sub.style.opacity = String(easeOutCubic(subt));
+      sub.style.transform = `translateX(-50%) translateY(${20 * (1 - easeOutCubic(subt))}px)`;
+    }
+  }
+
+  // ===== SCENE 2: The Shortcut (4-10s) =====
+  if (frame >= SCENE2_START && frame < SCENE2_END) {
+    const st = t - 4; // scene-local time (0-6s)
+    const scene = document.getElementById('scene2');
+
+    // Fade in / out
+    let sceneOpacity = Math.min(1, st / 0.4);
+    if (st > 5.2) sceneOpacity = Math.max(0, 1 - (st - 5.2) / 0.8);
+    scene.style.opacity = String(sceneOpacity);
+
+    // Title
+    const stitle = scene.querySelector('.scene-title');
+    stitle.style.opacity = String(Math.min(1, st / 0.4));
+
+    // Phone 1: slides in from left at t=4.5s (st=0.5)
+    const phone1 = document.getElementById('phone1');
+    const label1 = document.getElementById('label1');
+    const p1t = Math.max(0, Math.min(1, (st - 0.5) / 0.6));
+    const p1x = -300 + 300 * easeOutCubic(p1t); // from -300 offset to 0
+    phone1.style.opacity = String(easeOutCubic(p1t));
+    phone1.style.transform = `translateX(${-300 * (1 - easeOutCubic(p1t))}px)`;
+    label1.style.opacity = String(Math.max(0, Math.min(1, (st - 0.8) / 0.4)));
+    label1.style.transform = `translateX(-50%) translateY(${15 * (1 - easeOutCubic(Math.max(0, Math.min(1, (st - 0.8) / 0.4))))}px)`;
+
+    // When phone 2 appears, phone 1 shrinks slightly
+    if (st > 2.0) {
+      const shrinkT = Math.min(1, (st - 2.0) / 0.5);
+      const s = 1 - 0.1 * easeOutCubic(shrinkT);
+      phone1.style.transform = `translateX(0px) scale(${s})`;
+    }
+
+    // Phone 2: slides in center at t=6s (st=2)
+    const phone2 = document.getElementById('phone2');
+    const label2 = document.getElementById('label2');
+    const p2t = Math.max(0, Math.min(1, (st - 2.0) / 0.6));
+    phone2.style.opacity = String(easeOutCubic(p2t));
+    phone2.style.transform = `translateY(${60 * (1 - easeOutCubic(p2t))}px)`;
+    label2.style.opacity = String(Math.max(0, Math.min(1, (st - 2.3) / 0.4)));
+    label2.style.transform = `translateX(-50%) translateY(${15 * (1 - easeOutCubic(Math.max(0, Math.min(1, (st - 2.3) / 0.4))))}px)`;
+
+    // Phone 3: slides in from right at t=7.5s (st=3.5)
+    const phone3 = document.getElementById('phone3');
+    const label3 = document.getElementById('label3');
+    const p3t = Math.max(0, Math.min(1, (st - 3.5) / 0.6));
+    phone3.style.opacity = String(easeOutCubic(p3t));
+    phone3.style.transform = `translateX(${300 * (1 - easeOutCubic(p3t))}px)`;
+    label3.style.opacity = String(Math.max(0, Math.min(1, (st - 3.8) / 0.4)));
+    label3.style.transform = `translateX(-50%) translateY(${15 * (1 - easeOutCubic(Math.max(0, Math.min(1, (st - 3.8) / 0.4))))}px)`;
+
+    // Glow pulse when all 3 visible (st=4-5)
+    if (st >= 4.0 && st <= 5.2) {
+      const glowPhase = Math.sin((st - 4.0) * 4) * 0.5 + 0.5;
+      const glowStr = 15 + glowPhase * 25;
+      const glowCSS = `0 0 ${glowStr}px rgba(0,245,255,${0.15 + glowPhase * 0.2}), 0 0 ${glowStr * 2}px rgba(0,245,255,0.05)`;
+      phone1.style.boxShadow = glowCSS;
+      phone2.style.boxShadow = glowCSS;
+      phone3.style.boxShadow = glowCSS;
+    }
+  }
+
+  // ===== SCENE 3: How It Works (10-18s) =====
+  if (frame >= SCENE3_START && frame < SCENE3_END) {
+    const st = t - 10; // scene-local time (0-8s)
+    const scene = document.getElementById('scene3');
+
+    let sceneOpacity = Math.min(1, st / 0.5);
+    if (st > 7) sceneOpacity = Math.max(0, 1 - (st - 7) / 1);
+    scene.style.opacity = String(sceneOpacity);
+
+    // Title
+    const ptitle = document.getElementById('scene3title');
+    ptitle.style.opacity = String(Math.min(1, st / 0.5));
+
+    // Pipeline nodes stagger
+    const nodes = scene.querySelectorAll('.pipeline-node');
+    const arrows = scene.querySelectorAll('.pipeline-arrow');
+
+    for (let i = 0; i < nodes.length; i++) {
+      const nodeStart = 0.5 + i * 0.5;
+      const nt = Math.max(0, Math.min(1, (st - nodeStart) / 0.5));
+
+      if (nt <= 0) {
+        nodes[i].style.opacity = '0';
+        nodes[i].style.transform = 'translateY(60px)';
+      } else {
+        const spring = 1 + Math.sin(nt * Math.PI * 2) * (1 - nt) * 0.2;
+        const y = 60 * (1 - easeOutCubic(nt));
+        nodes[i].style.opacity = String(Math.min(1, nt * 2));
+        nodes[i].style.transform = `translateY(${y}px) scale(${0.8 + 0.2 * spring})`;
+
+        // Glow pulse
+        if (nt > 0.5) {
+          const glowPhase = Math.sin((st - nodeStart) * 3) * 0.5 + 0.5;
+          const glowSize = 30 + glowPhase * 20;
+          if (nodes[i].classList.contains('final')) {
+            nodes[i].style.boxShadow = `0 0 ${glowSize}px rgba(57,255,20,${0.1 + glowPhase * 0.15}), inset 0 0 30px rgba(57,255,20,0.05)`;
+          } else {
+            nodes[i].style.boxShadow = `0 0 ${glowSize}px rgba(0,245,255,${0.1 + glowPhase * 0.15}), inset 0 0 30px rgba(0,245,255,0.05)`;
+          }
+        }
+      }
+
+      // Arrow after node
+      if (i < arrows.length) {
+        const arrowStart = nodeStart + 0.3;
+        const at = Math.max(0, Math.min(1, (st - arrowStart) / 0.3));
+        arrows[i].style.opacity = at > 0 ? '1' : '0';
+        const aLine = arrows[i].querySelector('.line');
+        const aHead = arrows[i].querySelector('.head');
+        aLine.style.width = `${easeOutCubic(at) * 100}%`;
+        aHead.style.opacity = at > 0.8 ? '1' : '0';
+      }
+
+      // Green checkmark overlay (t=14-16s => st=4-6)
+      const checkStart = 4.0 + i * 0.4;
+      const checkT = Math.max(0, Math.min(1, (st - checkStart) / 0.3));
+      const checkEl = nodes[i].querySelector('.checkmark-overlay');
+      if (checkEl) {
+        checkEl.style.opacity = String(easeOutCubic(checkT));
+        const checkScale = 0.3 + 0.7 * easeOutCubic(checkT);
+        checkEl.style.transform = `scale(${checkScale})`;
+      }
+    }
+
+    // Screenshot panel appears at st=3 (t=13s)
+    const panel = document.getElementById('screenshotPanel');
+    const panelLabel = document.getElementById('screenshotPanelLabel');
+    const panelT = Math.max(0, Math.min(1, (st - 3.0) / 0.6));
+    panel.style.opacity = String(easeOutCubic(panelT));
+    panel.style.transform = `translateY(${-50 + 30 * (1 - easeOutCubic(panelT))}%) scale(${0.85 + 0.15 * easeOutCubic(panelT)})`;
+    panelLabel.style.opacity = String(Math.max(0, Math.min(1, (st - 3.5) / 0.4)));
+
+    // Panel glow pulse
+    if (panelT > 0.5) {
+      const gp = Math.sin((st - 3.0) * 3) * 0.5 + 0.5;
+      panel.style.boxShadow = `0 0 ${40 + gp * 30}px rgba(0,245,255,${0.25 + gp * 0.15}), 0 0 80px rgba(0,245,255,0.1)`;
+    }
+  }
+
+  // ===== SCENE 4: Before/After (18-25s) =====
+  if (frame >= SCENE4_START && frame <= SCENE4_END) {
+    const st = t - 18; // scene-local time (0-7s)
+    const scene = document.getElementById('scene4');
+
+    let sceneOpacity = Math.min(1, st / 0.5);
+    // Fade out at 24s (st=6)
+    if (st > 6) sceneOpacity = Math.max(0, 1 - (st - 6) / 1);
+    scene.style.opacity = String(sceneOpacity);
+
+    // Section titles
+    const beforeTitle = scene.querySelector('.before-title');
+    const afterTitle = scene.querySelector('.after-title');
+    beforeTitle.style.opacity = String(Math.min(1, st / 0.5));
+    afterTitle.style.opacity = String(Math.min(1, Math.max(0, (st - 0.3) / 0.5)));
+
+    // Divider
+    const divider = scene.querySelector('.divider');
+    const divH = Math.min(1, Math.max(0, st / 0.8));
+    divider.style.height = `${divH * 80}%`;
+
+    // Chaos texts
+    const chaosTexts = scene.querySelectorAll('.chaos-text');
+    chaosTexts.forEach((ct, i) => {
+      const ctStart = 0.3 + i * 0.15;
+      const ctt = Math.max(0, Math.min(1, (st - ctStart) / 0.4));
+      ct.style.opacity = String(ctt * 0.7);
+
+      if (ctt > 0) {
+        const floatX = Math.sin((st + i * 1.5) * 1.5) * 12;
+        const floatY = Math.cos((st + i * 2) * 1.2) * 10;
+        const rot = Math.sin((st + i) * 0.8) * 5;
+        ct.style.transform = `translate(${floatX}px, ${floatY}px) rotate(${rot}deg)`;
+      }
+    });
+
+    // Result phone mockup - slides in
+    const resultPhone = document.getElementById('resultPhone');
+    const resultLabel = document.getElementById('resultPhoneLabel');
+    const rpT = Math.max(0, Math.min(1, (st - 1.0) / 0.6));
+    resultPhone.style.opacity = String(easeOutCubic(rpT));
+    resultPhone.style.transform = `translateX(${60 * (1 - easeOutCubic(rpT))}px)`;
+    resultLabel.style.opacity = String(Math.max(0, Math.min(1, (st - 1.4) / 0.4)));
+
+    // Glow pulse on result phone
+    if (rpT > 0.5) {
+      const gp = Math.sin((st - 1.0) * 2.5) * 0.5 + 0.5;
+      resultPhone.style.boxShadow = `0 0 ${30 + gp * 20}px rgba(57,255,20,${0.15 + gp * 0.12}), 0 0 60px rgba(57,255,20,0.05)`;
+    }
+
+    // File cards below phone
+    const files = scene.querySelectorAll('.ordered-file');
+    files.forEach((f, i) => {
+      const fStart = 2.5 + i * 0.3;
+      const ft = Math.max(0, Math.min(1, (st - fStart) / 0.5));
+      f.style.opacity = String(easeOutCubic(ft));
+      f.style.transform = `translateX(${40 * (1 - easeOutCubic(ft))}px)`;
+
+      if (ft > 0.5) {
+        const gp = Math.sin((st - fStart) * 2) * 0.5 + 0.5;
+        f.style.boxShadow = `0 0 ${20 + gp * 15}px rgba(57,255,20,${0.08 + gp * 0.07})`;
+      }
+    });
+  }
+}
+
+// Expose for puppeteer
+window.setFrame = setFrame;
+window.TOTAL_FRAMES = TOTAL_FRAMES;
+window.FPS = FPS;
+
+// Auto-play for preview
+if (!window.__PUPPETEER__) {
+  let currentFrame = 0;
+  function animate() {
+    setFrame(currentFrame);
+    currentFrame++;
+    if (currentFrame <= TOTAL_FRAMES) requestAnimationFrame(animate);
+  }
+  animate();
+}
+</script>
+</body>
+</html>

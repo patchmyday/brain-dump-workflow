@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1920px; height: 1080px; overflow: hidden;
+  background: #0A0A0A; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #fff;
+}
+
+/* ===== DOT GRID BACKGROUND ===== */
+.dot-grid {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: radial-gradient(circle, rgba(0,245,255,0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+/* ===== SCENE CONTAINERS ===== */
+.scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 1; }
+.scene.active { opacity: 1; }
+
+/* ===== SCENE 1: BRAIN DUMP INTRO ===== */
+#scene1 .title {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 180px; font-weight: 800; letter-spacing: -4px;
+  text-shadow: 0 0 60px rgba(0,245,255,0.5), 0 0 120px rgba(0,245,255,0.2);
+  opacity: 0;
+  white-space: nowrap;
+}
+#scene1 .title .brain { color: #fff; }
+#scene1 .title .dump { color: #00F5FF; }
+
+#scene1 .subtitle {
+  position: absolute; top: calc(50% + 110px); left: 50%; transform: translateX(-50%);
+  font-size: 52px; font-weight: 300; color: rgba(255,255,255,0.7);
+  letter-spacing: 2px; opacity: 0;
+  white-space: nowrap;
+}
+
+#scene1 .accent-line {
+  position: absolute; top: calc(50% + 80px); left: 50%; transform: translateX(-50%);
+  width: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, #00F5FF, #FF00FF, transparent);
+  box-shadow: 0 0 20px #00F5FF, 0 0 40px rgba(0,245,255,0.3);
+}
+
+#scene1 .glow-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0;
+}
+#scene1 .glow-orb.cyan { 
+  width: 400px; height: 400px; background: rgba(0,245,255,0.15);
+  top: 20%; left: 20%;
+}
+#scene1 .glow-orb.magenta {
+  width: 300px; height: 300px; background: rgba(255,0,255,0.1);
+  top: 50%; right: 15%;
+}
+
+/* ===== SCENE 2: WORKFLOW PIPELINE ===== */
+#scene2 .pipeline-title {
+  position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+  font-size: 72px; font-weight: 700; letter-spacing: 1px; opacity: 0;
+  text-shadow: 0 0 30px rgba(0,245,255,0.4);
+}
+
+.pipeline-container {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 0;
+}
+
+.pipeline-node {
+  width: 280px; height: 170px; border-radius: 24px;
+  background: rgba(0,245,255,0.08);
+  border: 1.5px solid rgba(0,245,255,0.3);
+  backdrop-filter: blur(20px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; opacity: 0; transform: translateY(60px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05);
+}
+.pipeline-node .icon { width: 72px; height: 72px; margin-bottom: 12px; }
+.pipeline-node .icon svg { width: 72px; height: 72px; }
+.pipeline-node .label { font-size: 26px; font-weight: 600; letter-spacing: 0.5px; }
+
+.pipeline-node.final {
+  background: rgba(57,255,20,0.08);
+  border-color: rgba(57,255,20,0.4);
+  box-shadow: 0 0 30px rgba(57,255,20,0.15), inset 0 0 30px rgba(57,255,20,0.05);
+}
+.pipeline-node.final .icon { color: #39FF14; }
+.pipeline-node.final .label { color: #39FF14; }
+
+.pipeline-arrow {
+  width: 80px; height: 4px; position: relative; margin: 0 8px;
+  opacity: 0;
+}
+.pipeline-arrow .line {
+  width: 0; height: 100%;
+  background: linear-gradient(90deg, #FF00FF, #00F5FF);
+  box-shadow: 0 0 10px rgba(255,0,255,0.5);
+  position: absolute; top: 0; left: 0;
+}
+.pipeline-arrow .head {
+  position: absolute; right: -8px; top: -5px;
+  width: 0; height: 0;
+  border-left: 10px solid #00F5FF;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  opacity: 0;
+  filter: drop-shadow(0 0 5px #00F5FF);
+}
+
+/* ===== SCENE 3: BEFORE / AFTER ===== */
+#scene3 .section-title {
+  position: absolute; top: 60px; font-size: 64px; font-weight: 700; opacity: 0;
+}
+#scene3 .before-title { left: 25%; transform: translateX(-50%); color: #FF00FF;
+  text-shadow: 0 0 30px rgba(255,0,255,0.4); }
+#scene3 .after-title { left: 75%; transform: translateX(-50%); color: #39FF14;
+  text-shadow: 0 0 30px rgba(57,255,20,0.4); }
+
+#scene3 .divider {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 2px; height: 0;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.chaos-text {
+  position: absolute; font-size: 34px; opacity: 0; font-weight: 500;
+  color: rgba(255,255,255,0.6);
+}
+
+.ordered-file {
+  position: absolute; width: 480px; height: 80px; border-radius: 14px;
+  background: rgba(57,255,20,0.06); border: 1px solid rgba(57,255,20,0.2);
+  display: flex; align-items: center; padding: 0 20px; gap: 15px;
+  opacity: 0; transform: translateX(40px);
+  box-shadow: 0 0 20px rgba(57,255,20,0.08);
+}
+.ordered-file .file-icon { font-size: 38px; }
+.ordered-file .file-info .file-name { font-size: 22px; font-weight: 600; }
+.ordered-file .file-info .file-date { font-size: 17px; color: rgba(255,255,255,0.4); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes springIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  70% { transform: translate(-50%, -50%) scale(0.97); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes lineWipe {
+  from { width: 0; }
+  to { width: 500px; }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes nodeSlideIn {
+  0% { opacity: 0; transform: translateY(60px); }
+  60% { opacity: 1; transform: translateY(-8px); }
+  80% { transform: translateY(3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes arrowDraw {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes chaosFloat {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -15px) rotate(3deg); }
+  50% { transform: translate(-8px, 8px) rotate(-2deg); }
+  75% { transform: translate(12px, 5px) rotate(2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes fileSlideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05); }
+  50% { box-shadow: 0 0 50px rgba(0,245,255,0.25), inset 0 0 40px rgba(0,245,255,0.1); }
+}
+
+/* Timeline-driven animations */
+.scene1-active #scene1 { opacity: 1; }
+.scene1-active #scene1 .glow-orb { animation: fadeIn 1s ease forwards; }
+.scene1-active #scene1 .title { animation: springIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards; }
+.scene1-active #scene1 .accent-line { animation: lineWipe 0.8s ease-out 1.2s forwards; }
+.scene1-active #scene1 .subtitle { animation: fadeInUp 0.8s ease-out 1.8s forwards; }
+
+.scene2-active #scene2 { opacity: 1; }
+.scene2-active #scene2 .pipeline-title { animation: fadeIn 0.6s ease forwards; }
+
+.scene3-active #scene3 { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="dot-grid"></div>
+
+<!-- SCENE 1: Brain Dump Intro -->
+<div class="scene" id="scene1">
+  <div class="glow-orb cyan"></div>
+  <div class="glow-orb magenta"></div>
+  <div class="title"><span class="brain">Brain </span><span class="dump">Dump</span></div>
+  <div class="accent-line"></div>
+  <div class="subtitle">Capture ideas in 10 seconds</div>
+</div>
+
+<!-- SCENE 2: Workflow Pipeline -->
+<div class="scene" id="scene2">
+  <div class="pipeline-title">How It <span style="color:#00F5FF">Works</span></div>
+  <div class="pipeline-container">
+    <div class="pipeline-node" id="node1">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><div class="label">Voice</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow1"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node2">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="label">Dictate</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow2"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node3">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></div><div class="label">Format Date</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow3"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node" id="node4">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div><div class="label">Save</div>
+    </div>
+    <div class="pipeline-arrow" id="arrow4"><div class="line"></div><div class="head"></div></div>
+    <div class="pipeline-node final" id="node5">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg></div><div class="label">.md File</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENE 3: Before/After -->
+<div class="scene" id="scene3">
+  <div class="section-title before-title">Before</div>
+  <div class="section-title after-title">After</div>
+  <div class="divider"></div>
+  
+  <!-- Chaos side -->
+  <div class="chaos-text" id="ct1" style="left:80px;top:220px;font-size:36px;transform:rotate(-8deg)">💭 shower idea...</div>
+  <div class="chaos-text" id="ct2" style="left:200px;top:380px;font-size:32px;transform:rotate(5deg)">🚗 car thought</div>
+  <div class="chaos-text" id="ct3" style="left:50px;top:500px;font-size:38px;transform:rotate(-3deg)">🌙 3am insight!</div>
+  <div class="chaos-text" id="ct4" style="left:280px;top:300px;font-size:30px;transform:rotate(12deg)">📱 quick note?</div>
+  <div class="chaos-text" id="ct5" style="left:120px;top:640px;font-size:34px;transform:rotate(-6deg)">💡 billion $ idea</div>
+  <div class="chaos-text" id="ct6" style="left:320px;top:580px;font-size:30px;transform:rotate(8deg)">🤔 what was it...</div>
+  <div class="chaos-text" id="ct7" style="left:60px;top:780px;font-size:32px;transform:rotate(-10deg)">😤 forgot again</div>
+  
+  <!-- Ordered side -->
+  <div class="ordered-file" id="f1" style="left:1020px;top:200px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-13.md</div><div class="file-date">April 13, 2025 • 8:42 AM</div></div>
+  </div>
+  <div class="ordered-file" id="f2" style="left:1020px;top:320px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-12.md</div><div class="file-date">April 12, 2025 • 3:15 PM</div></div>
+  </div>
+  <div class="ordered-file" id="f3" style="left:1020px;top:440px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-11.md</div><div class="file-date">April 11, 2025 • 11:20 AM</div></div>
+  </div>
+  <div class="ordered-file" id="f4" style="left:1020px;top:560px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-10.md</div><div class="file-date">April 10, 2025 • 7:00 PM</div></div>
+  </div>
+  <div class="ordered-file" id="f5" style="left:1020px;top:680px">
+    <div class="file-icon">📄</div>
+    <div class="file-info"><div class="file-name">brain-dump-2025-04-09.md</div><div class="file-date">April 9, 2025 • 9:30 AM</div></div>
+  </div>
+</div>
+
+<script>
+// Animation timeline controller
+// This script exposes window.currentFrame for puppeteer to set
+const FPS = 30;
+const TOTAL_SECONDS = 20;
+const TOTAL_FRAMES = FPS * TOTAL_SECONDS;
+
+// Scene boundaries in frames
+const SCENE1_START = 0;
+const SCENE1_END = 5 * FPS;    // 0-5s
+const SCENE2_START = 5 * FPS;
+const SCENE2_END = 13 * FPS;   // 5-13s  
+const SCENE3_START = 13 * FPS;
+const SCENE3_END = 20 * FPS;   // 13-20s
+
+function setFrame(frame) {
+  const t = frame / FPS; // time in seconds
+  
+  // Reset
+  document.body.className = '';
+  
+  // ===== SCENE 1 =====
+  if (frame >= SCENE1_START && frame < SCENE1_END) {
+    const st = t; // scene-local time
+    const scene = document.getElementById('scene1');
+    scene.style.opacity = '1';
+    
+    // Fade out at end
+    if (st > 4.2) {
+      scene.style.opacity = String(Math.max(0, 1 - (st - 4.2) / 0.8));
+    }
+    
+    // Glow orbs
+    const orbs = scene.querySelectorAll('.glow-orb');
+    orbs.forEach(o => { o.style.opacity = String(Math.min(1, st / 1)); });
+    
+    // Title spring animation
+    const title = scene.querySelector('.title');
+    if (st < 0.3) {
+      title.style.opacity = '0';
+      title.style.transform = 'translate(-50%, -50%) scale(0.3)';
+    } else {
+      const tt = Math.min(1, (st - 0.3) / 0.8);
+      // Spring function
+      const spring = 1 + Math.sin(tt * Math.PI * 2.5) * (1 - tt) * 0.15;
+      const scale = 0.3 + (1 - 0.3) * easeOutCubic(tt) * spring;
+      title.style.opacity = String(Math.min(1, tt * 3));
+      title.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+    
+    // Accent line
+    const line = scene.querySelector('.accent-line');
+    if (st < 1.2) {
+      line.style.width = '0px';
+    } else {
+      const lt = Math.min(1, (st - 1.2) / 0.8);
+      line.style.width = `${easeOutCubic(lt) * 500}px`;
+    }
+    
+    // Subtitle
+    const sub = scene.querySelector('.subtitle');
+    if (st < 1.8) {
+      sub.style.opacity = '0';
+      sub.style.transform = 'translateX(-50%) translateY(20px)';
+    } else {
+      const subt = Math.min(1, (st - 1.8) / 0.8);
+      sub.style.opacity = String(easeOutCubic(subt));
+      sub.style.transform = `translateX(-50%) translateY(${20 * (1 - easeOutCubic(subt))}px)`;
+    }
+  } else {
+    document.getElementById('scene1').style.opacity = '0';
+  }
+  
+  // ===== SCENE 2 =====
+  if (frame >= SCENE2_START && frame < SCENE2_END) {
+    const st = t - 5; // scene-local time (0-8s)
+    const scene = document.getElementById('scene2');
+    
+    // Fade in
+    let sceneOpacity = Math.min(1, st / 0.5);
+    // Fade out at end
+    if (st > 7) sceneOpacity = Math.max(0, 1 - (st - 7) / 1);
+    scene.style.opacity = String(sceneOpacity);
+    
+    // Title
+    const ptitle = scene.querySelector('.pipeline-title');
+    ptitle.style.opacity = String(Math.min(1, st / 0.5));
+    
+    // Nodes stagger
+    const nodes = scene.querySelectorAll('.pipeline-node');
+    const arrows = scene.querySelectorAll('.pipeline-arrow');
+    
+    for (let i = 0; i < nodes.length; i++) {
+      const nodeStart = 0.5 + i * 0.8;
+      const nt = Math.max(0, Math.min(1, (st - nodeStart) / 0.6));
+      
+      if (nt <= 0) {
+        nodes[i].style.opacity = '0';
+        nodes[i].style.transform = 'translateY(60px)';
+      } else {
+        // Spring bounce
+        const spring = 1 + Math.sin(nt * Math.PI * 2) * (1 - nt) * 0.2;
+        const y = 60 * (1 - easeOutCubic(nt));
+        nodes[i].style.opacity = String(Math.min(1, nt * 2));
+        nodes[i].style.transform = `translateY(${y}px) scale(${0.8 + 0.2 * spring})`;
+        
+        // Glow pulse when visible
+        if (nt > 0.5) {
+          const glowPhase = Math.sin((st - nodeStart) * 3) * 0.5 + 0.5;
+          const glowSize = 30 + glowPhase * 20;
+          if (nodes[i].classList.contains('final')) {
+            nodes[i].style.boxShadow = `0 0 ${glowSize}px rgba(57,255,20,${0.1 + glowPhase * 0.15}), inset 0 0 30px rgba(57,255,20,0.05)`;
+          } else {
+            nodes[i].style.boxShadow = `0 0 ${glowSize}px rgba(0,245,255,${0.1 + glowPhase * 0.15}), inset 0 0 30px rgba(0,245,255,0.05)`;
+          }
+        }
+      }
+      
+      // Arrow after node
+      if (i < arrows.length) {
+        const arrowStart = nodeStart + 0.4;
+        const at = Math.max(0, Math.min(1, (st - arrowStart) / 0.4));
+        arrows[i].style.opacity = at > 0 ? '1' : '0';
+        const aLine = arrows[i].querySelector('.line');
+        const aHead = arrows[i].querySelector('.head');
+        aLine.style.width = `${easeOutCubic(at) * 100}%`;
+        aHead.style.opacity = at > 0.8 ? '1' : '0';
+      }
+    }
+  } else {
+    document.getElementById('scene2').style.opacity = '0';
+  }
+  
+  // ===== SCENE 3 =====
+  if (frame >= SCENE3_START && frame <= SCENE3_END) {
+    const st = t - 13; // scene-local time (0-7s)
+    const scene = document.getElementById('scene3');
+    
+    let sceneOpacity = Math.min(1, st / 0.5);
+    scene.style.opacity = String(sceneOpacity);
+    
+    // Section titles
+    const beforeTitle = scene.querySelector('.before-title');
+    const afterTitle = scene.querySelector('.after-title');
+    beforeTitle.style.opacity = String(Math.min(1, st / 0.5));
+    afterTitle.style.opacity = String(Math.min(1, Math.max(0, (st - 0.3) / 0.5)));
+    
+    // Divider
+    const divider = scene.querySelector('.divider');
+    const divH = Math.min(1, Math.max(0, st / 0.8));
+    divider.style.height = `${divH * 80}%`;
+    
+    // Chaos texts - appear with floating animation
+    const chaosTexts = document.querySelectorAll('.chaos-text');
+    chaosTexts.forEach((ct, i) => {
+      const ctStart = 0.3 + i * 0.15;
+      const ctt = Math.max(0, Math.min(1, (st - ctStart) / 0.4));
+      ct.style.opacity = String(ctt * 0.7);
+      
+      // Floating effect
+      if (ctt > 0) {
+        const floatX = Math.sin((st + i * 1.5) * 1.5) * 12;
+        const floatY = Math.cos((st + i * 2) * 1.2) * 10;
+        const rot = Math.sin((st + i) * 0.8) * 5;
+        ct.style.transform = `translate(${floatX}px, ${floatY}px) rotate(${rot}deg)`;
+      }
+    });
+    
+    // Ordered files - slide in with stagger
+    const files = document.querySelectorAll('.ordered-file');
+    files.forEach((f, i) => {
+      const fStart = 1.5 + i * 0.3;
+      const ft = Math.max(0, Math.min(1, (st - fStart) / 0.5));
+      f.style.opacity = String(easeOutCubic(ft));
+      f.style.transform = `translateX(${40 * (1 - easeOutCubic(ft))}px)`;
+      
+      // Subtle glow on appear
+      if (ft > 0.5) {
+        const gp = Math.sin((st - fStart) * 2) * 0.5 + 0.5;
+        f.style.boxShadow = `0 0 ${20 + gp * 15}px rgba(57,255,20,${0.08 + gp * 0.07})`;
+      }
+    });
+  } else {
+    document.getElementById('scene3').style.opacity = '0';
+  }
+}
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+// Expose for puppeteer
+window.setFrame = setFrame;
+window.TOTAL_FRAMES = TOTAL_FRAMES;
+window.FPS = FPS;
+
+// Auto-play for preview
+let currentFrame = 0;
+function animate() {
+  setFrame(currentFrame);
+  currentFrame++;
+  if (currentFrame <= TOTAL_FRAMES) requestAnimationFrame(animate);
+}
+// Don't auto-play when puppeteer controls it
+if (!window.__PUPPETEER__) animate();
+</script>
+</body>
+</html>

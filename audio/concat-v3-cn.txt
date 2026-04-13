@@ -1,0 +1,8 @@
+file '01-hook-cn.mp3'
+file '02-intro-cn.mp3'
+file '03-build-dictation-cn.mp3'
+file '04-build-timestamp-cn.mp3'
+file '05-build-save-cn.mp3'
+file '06-build-notification-cn.mp3'
+file '07-demo-cn.mp3'
+file '09-cta-cn.mp3'

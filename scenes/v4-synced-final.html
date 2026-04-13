@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1920px; height: 1080px; overflow: hidden;
+  background: #0A0A0A; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #fff;
+}
+
+/* ===== DOT GRID BACKGROUND ===== */
+.dot-grid {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: radial-gradient(circle, rgba(0,245,255,0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+/* ===== SCENE CONTAINERS ===== */
+.scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 1; }
+
+/* ===== PHONE MOCKUP ===== */
+.phone-mockup {
+  position: absolute;
+  width: 360px; height: 780px;
+  background: #1a1a2e;
+  border: 3px solid rgba(0,245,255,0.5);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,245,255,0.15), 0 0 60px rgba(0,245,255,0.05);
+}
+.phone-mockup::before {
+  content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 100px; height: 24px; background: #0A0A0A; border-radius: 12px; z-index: 10;
+}
+.phone-mockup img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.phone-label {
+  position: absolute;
+  font-size: 32px; font-weight: 600; color: #00F5FF;
+  text-align: center; white-space: nowrap;
+  text-shadow: 0 0 15px rgba(0,245,255,0.4);
+}
+
+/* ===== SCENE 1: HOOK ===== */
+#scene1 .title {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 180px; font-weight: 800; letter-spacing: -4px;
+  text-shadow: 0 0 60px rgba(0,245,255,0.5), 0 0 120px rgba(0,245,255,0.2);
+  opacity: 0; white-space: nowrap;
+}
+#scene1 .title .brain { color: #fff; }
+#scene1 .title .dump { color: #00F5FF; }
+
+#scene1 .subtitle {
+  position: absolute; top: calc(50% + 110px); left: 50%; transform: translateX(-50%);
+  font-size: 52px; font-weight: 300; color: rgba(255,255,255,0.7);
+  letter-spacing: 2px; opacity: 0; white-space: nowrap;
+}
+
+#scene1 .accent-line {
+  position: absolute; top: calc(50% + 80px); left: 50%; transform: translateX(-50%);
+  width: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, #00F5FF, #FF00FF, transparent);
+  box-shadow: 0 0 20px #00F5FF, 0 0 40px rgba(0,245,255,0.3);
+}
+
+#scene1 .glow-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0;
+}
+#scene1 .glow-orb.cyan {
+  width: 400px; height: 400px; background: rgba(0,245,255,0.15);
+  top: 20%; left: 20%;
+}
+#scene1 .glow-orb.magenta {
+  width: 300px; height: 300px; background: rgba(255,0,255,0.1);
+  top: 50%; right: 15%;
+}
+
+/* ===== SCENE TITLES ===== */
+.scene-title {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+  font-size: 72px; font-weight: 700; letter-spacing: 1px; opacity: 0;
+  text-shadow: 0 0 30px rgba(0,245,255,0.4);
+  white-space: nowrap;
+}
+
+/* ===== GLASSMORPHISM CARD ===== */
+.glass-card {
+  background: rgba(0,245,255,0.06);
+  border: 1.5px solid rgba(0,245,255,0.3);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05);
+  padding: 30px;
+}
+
+/* ===== ANNOTATION BOX ===== */
+.annotation {
+  position: absolute;
+  background: rgba(0,0,0,0.7);
+  border: 1.5px solid rgba(0,245,255,0.4);
+  border-radius: 16px;
+  padding: 18px 28px;
+  font-size: 30px; font-weight: 600;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(0,245,255,0.15);
+  opacity: 0;
+  white-space: nowrap;
+}
+.annotation .cyan { color: #00F5FF; }
+.annotation .green { color: #39FF14; }
+.annotation .red { color: #FF4444; }
+
+/* ===== SCENE 6: STEPS LIST ===== */
+.steps-card {
+  position: absolute;
+  width: 520px;
+  background: rgba(0,245,255,0.06);
+  border: 1.5px solid rgba(0,245,255,0.3);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05);
+  padding: 30px 40px;
+}
+.steps-card .step-item {
+  font-size: 32px; font-weight: 500; color: rgba(255,255,255,0.7);
+  margin: 12px 0; display: flex; justify-content: space-between; align-items: center;
+}
+.steps-card .step-item .check {
+  color: #39FF14; font-size: 32px; opacity: 0;
+  text-shadow: 0 0 10px rgba(57,255,20,0.5);
+}
+
+/* ===== SCENE 7: DEMO ===== */
+.mic-container {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  background: #111;
+}
+.mic-ring {
+  width: 120px; height: 120px; border-radius: 50%;
+  border: 4px solid #FF4444;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 60px;
+}
+.notification-popup {
+  position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 80px;
+  background: rgba(57,255,20,0.1);
+  border: 1.5px solid rgba(57,255,20,0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 700; color: #39FF14;
+  box-shadow: 0 0 30px rgba(57,255,20,0.2);
+  text-shadow: 0 0 10px rgba(57,255,20,0.5);
+}
+.timer-overlay {
+  position: absolute; bottom: 40px; right: 60px;
+  font-family: 'Courier New', monospace; font-size: 48px; font-weight: 700;
+  color: #39FF14; text-shadow: 0 0 15px rgba(57,255,20,0.5);
+  opacity: 0;
+}
+
+/* ===== SCENE 8: POWER TIPS CARDS ===== */
+.tip-card {
+  position: absolute;
+  width: 400px; height: 250px;
+  background: rgba(0,245,255,0.06);
+  border: 1.5px solid rgba(0,245,255,0.3);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.05);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(60px);
+}
+.tip-card .tip-icon { font-size: 56px; margin-bottom: 16px; }
+.tip-card .tip-title { font-size: 30px; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; }
+.tip-card .tip-sub { font-size: 22px; font-weight: 400; color: rgba(255,255,255,0.6); text-align: center; }
+
+/* ===== SCENE 9: CTA ===== */
+#scene9 .brand {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
+  font-size: 140px; font-weight: 800; letter-spacing: -3px;
+  color: #00F5FF; opacity: 0; white-space: nowrap;
+  text-shadow: 0 0 60px rgba(0,245,255,0.5), 0 0 120px rgba(0,245,255,0.2);
+}
+#scene9 .cta-sub {
+  position: absolute; top: calc(50% + 60px); left: 50%; transform: translateX(-50%);
+  font-size: 44px; font-weight: 300; color: rgba(255,255,255,0.7);
+  letter-spacing: 2px; opacity: 0; white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div class="dot-grid"></div>
+
+<!-- Preload images -->
+<img id="preload01" src="../../assets/screenshots/01-spotlight-search.jpg" style="display:none">
+<img id="preload02" src="../../assets/screenshots/02-shortcuts-library.jpg" style="display:none">
+<img id="preload03" src="../../assets/screenshots/03-search-dictate.jpg" style="display:none">
+<img id="preload04" src="../../assets/screenshots/04-editor-dictate-date.jpg" style="display:none">
+<img id="preload05" src="../../assets/screenshots/05-editor-save-notify.jpg" style="display:none">
+<img id="preload06" src="../../assets/screenshots/06-files-result.jpg" style="display:none">
+
+<!-- SCENE 1: HOOK (0-7.4s) -->
+<div class="scene" id="scene1">
+  <div class="glow-orb cyan"></div>
+  <div class="glow-orb magenta"></div>
+  <div class="title"><span class="brain">Brain </span><span class="dump">Dump</span></div>
+  <div class="accent-line"></div>
+  <div class="subtitle">Capture ideas in 10 seconds</div>
+</div>
+
+<!-- SCENE 2: INTRO (7.4-23.2s) -->
+<div class="scene" id="scene2">
+  <div class="scene-title">The <span style="color:#00F5FF">Shortcut</span></div>
+  <div class="phone-mockup" id="s2phone" style="left:780px; top:140px; opacity:0;">
+    <img id="s2img1" src="../../assets/screenshots/01-spotlight-search.jpg">
+    <img id="s2img2" src="../../assets/screenshots/02-shortcuts-library.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;">
+  </div>
+  <div class="phone-label" id="s2label" style="left:960px; top:940px; transform:translateX(-50%); opacity:0;">iPhone Shortcuts</div>
+</div>
+
+<!-- SCENE 3: BUILD DICTATE (23.2-54.0s) -->
+<div class="scene" id="scene3">
+  <div class="scene-title">Step 1: <span style="color:#00F5FF">Voice Input</span></div>
+  <div class="phone-mockup" id="s3phone1" style="left:300px; top:140px; opacity:0;">
+    <img src="../../assets/screenshots/03-search-dictate.jpg">
+  </div>
+  <div class="phone-label" id="s3label1" style="left:480px; top:940px; transform:translateX(-50%); opacity:0;">Search "Dictate Text"</div>
+  <div class="phone-mockup" id="s3phone2" style="left:1100px; top:140px; opacity:0;">
+    <img src="../../assets/screenshots/04-editor-dictate-date.jpg">
+  </div>
+  <div class="phone-label" id="s3label2" style="left:1280px; top:940px; transform:translateX(-50%); opacity:0;">Add to Shortcut</div>
+  <div class="annotation" id="s3annot" style="right:80px; top:200px;">Stop Listening → <span class="cyan">After Pause</span></div>
+</div>
+
+<!-- SCENE 4: BUILD TIMESTAMP (54.0-96.2s) -->
+<div class="scene" id="scene4">
+  <div class="scene-title">Step 2: <span style="color:#00F5FF">Timestamp</span></div>
+  <div class="phone-mockup" id="s4phone" style="left:780px; top:120px; opacity:0;">
+    <img src="../../assets/screenshots/04-editor-dictate-date.jpg">
+  </div>
+  <div class="annotation" id="s4format" style="left:50%; top:400px; transform:translateX(-50%); font-family:'Courier New',monospace; font-size:48px;">
+    <span class="cyan">yyyy-MM-dd-HHmm</span>
+  </div>
+  <div class="annotation" id="s4preview" style="left:50%; top:500px; transform:translateX(-50%); font-family:'Courier New',monospace; font-size:42px;">
+    ↓ <span class="green">2026-04-10-1231</span>
+  </div>
+</div>
+
+<!-- SCENE 5: BUILD SAVE (96.2-134.0s) -->
+<div class="scene" id="scene5">
+  <div class="scene-title">Step 3: <span style="color:#00F5FF">Save to iCloud</span></div>
+  <div class="phone-mockup" id="s5phone" style="left:780px; top:120px; opacity:0;">
+    <img src="../../assets/screenshots/05-editor-save-notify.jpg">
+  </div>
+  <div class="annotation" id="s5a1" style="right:100px; top:250px;">Save File → <span class="cyan">iCloud Drive</span></div>
+  <div class="annotation" id="s5a2" style="right:100px; top:400px; font-family:'Courier New',monospace;"><span class="cyan">journal_inbox/</span></div>
+  <div class="annotation" id="s5a3" style="right:100px; top:550px;">Ask Where to Save: <span class="red">OFF</span></div>
+</div>
+
+<!-- SCENE 6: BUILD RENAME (134.0-178.7s) -->
+<div class="scene" id="scene6">
+  <div class="scene-title">Step 4: <span style="color:#00F5FF">Rename & Notify</span></div>
+  <div class="phone-mockup" id="s6phone" style="left:200px; top:140px; opacity:0;">
+    <img src="../../assets/screenshots/05-editor-save-notify.jpg">
+  </div>
+  <div class="steps-card" id="s6card" style="left:900px; top:160px; opacity:0;">
+    <div class="step-item"><span>1. Dictate Text</span><span class="check" id="ck1">✓</span></div>
+    <div class="step-item"><span>2. Current Date</span><span class="check" id="ck2">✓</span></div>
+    <div class="step-item"><span>3. Format Date</span><span class="check" id="ck3">✓</span></div>
+    <div class="step-item"><span>4. Text</span><span class="check" id="ck4">✓</span></div>
+    <div class="step-item"><span>5. Save File</span><span class="check" id="ck5">✓</span></div>
+    <div class="step-item"><span>6. Rename</span><span class="check" id="ck6">✓</span></div>
+    <div class="step-item"><span>7. Show Notification</span><span class="check" id="ck7">✓</span></div>
+  </div>
+  <div class="annotation" id="s6filename" style="left:900px; bottom:100px; font-family:'Courier New',monospace; font-size:34px;">
+    <span class="green">2026-04-10-1231-brain-dump.md</span>
+  </div>
+</div>
+
+<!-- SCENE 7: DEMO (178.7-215.9s) -->
+<div class="scene" id="scene7">
+  <div class="scene-title" id="s7title" style="font-size:96px;">Demo</div>
+  <div class="phone-mockup" id="s7phone" style="left:780px; top:120px; opacity:0;">
+    <img id="s7img1" src="../../assets/screenshots/02-shortcuts-library.jpg">
+    <!-- Recording state overlay -->
+    <div id="s7mic" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;opacity:0;">
+      <div class="mic-ring" id="s7ring">🎙️</div>
+    </div>
+    <!-- Notification popup -->
+    <div class="notification-popup" id="s7notif">Brain Dump Saved ✓</div>
+    <img id="s7img2" src="../../assets/screenshots/06-files-result.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;">
+  </div>
+  <div class="phone-label" id="s7label" style="left:960px; top:920px; transform:translateX(-50%); opacity:0;"></div>
+  <div class="timer-overlay" id="s7timer">0.0s</div>
+</div>
+
+<!-- SCENE 8: POWER TIPS (215.9-256.8s) -->
+<div class="scene" id="scene8">
+  <div class="scene-title">Power <span style="color:#00F5FF">Moves</span></div>
+  <div class="tip-card" id="tip1" style="left:160px; top:340px;">
+    <div class="tip-icon">📱</div>
+    <div class="tip-title">Add to Home Screen</div>
+    <div class="tip-sub">One-tap dock icon</div>
+  </div>
+  <div class="tip-card" id="tip2" style="left:760px; top:340px;">
+    <div class="tip-icon">🗣️</div>
+    <div class="tip-title">Hey Siri, Brain Dump</div>
+    <div class="tip-sub">Hands-free while driving</div>
+  </div>
+  <div class="tip-card" id="tip3" style="left:1360px; top:340px;">
+    <div class="tip-icon">🤖</div>
+    <div class="tip-title">AI Agent Pipeline</div>
+    <div class="tip-sub">Auto-extract action items</div>
+  </div>
+</div>
+
+<!-- SCENE 9: CTA (256.8-275s) -->
+<div class="scene" id="scene9">
+  <div class="glow-orb cyan" style="top:30%;left:30%;"></div>
+  <div class="glow-orb magenta" style="top:40%;right:20%;"></div>
+  <div class="brand">PatchMyDay</div>
+  <div class="cta-sub">Subscribe for more automation</div>
+</div>
+
+<script>
+const FPS = 30;
+const TOTAL_FRAMES = 8250; // 275s * 30fps
+
+// Scene boundaries in seconds
+const SCENES = [
+  { id: 'scene1', start: 0,     end: 7.4   },
+  { id: 'scene2', start: 7.4,   end: 23.2  },
+  { id: 'scene3', start: 23.2,  end: 54.0  },
+  { id: 'scene4', start: 54.0,  end: 96.2  },
+  { id: 'scene5', start: 96.2,  end: 134.0 },
+  { id: 'scene6', start: 134.0, end: 178.7 },
+  { id: 'scene7', start: 178.7, end: 215.9 },
+  { id: 'scene8', start: 215.9, end: 256.8 },
+  { id: 'scene9', start: 256.8, end: 275.0 },
+];
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3); }
+function clamp01(t) { return Math.max(0, Math.min(1, t)); }
+function fadeIn(t, start, dur) { return easeOutCubic(clamp01((t - start) / dur)); }
+function fadeOut(t, start, dur) { return 1 - clamp01((t - start) / dur); }
+
+function setFrame(frame) {
+  const t = frame / FPS; // global time in seconds
+
+  // Hide all scenes
+  SCENES.forEach(s => {
+    document.getElementById(s.id).style.opacity = '0';
+  });
+
+  // ===== SCENE 1: HOOK (0-7.4s) =====
+  if (t >= 0 && t < 7.4) {
+    const scene = document.getElementById('scene1');
+    let op = 1;
+    if (t > 6.4) op = fadeOut(t, 6.4, 1.0);
+    scene.style.opacity = String(op);
+
+    // Glow orbs
+    const orbs = scene.querySelectorAll('.glow-orb');
+    orbs.forEach(o => { o.style.opacity = String(clamp01(t / 1.5)); });
+
+    // Title spring
+    const title = scene.querySelector('.title');
+    if (t < 0.3) {
+      title.style.opacity = '0';
+      title.style.transform = 'translate(-50%, -50%) scale(0.3)';
+    } else {
+      const tt = clamp01((t - 0.3) / 1.0);
+      const spring = 1 + Math.sin(tt * Math.PI * 2.5) * (1 - tt) * 0.15;
+      const scale = 0.3 + 0.7 * easeOutCubic(tt) * spring;
+      title.style.opacity = String(clamp01(tt * 3));
+      title.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+
+    // Accent line
+    const line = scene.querySelector('.accent-line');
+    if (t < 1.5) { line.style.width = '0px'; }
+    else { line.style.width = `${easeOutCubic(clamp01((t - 1.5) / 1.0)) * 500}px`; }
+
+    // Subtitle
+    const sub = scene.querySelector('.subtitle');
+    if (t < 2.5) {
+      sub.style.opacity = '0'; sub.style.transform = 'translateX(-50%) translateY(20px)';
+    } else {
+      const st = clamp01((t - 2.5) / 1.0);
+      sub.style.opacity = String(easeOutCubic(st));
+      sub.style.transform = `translateX(-50%) translateY(${20 * (1 - easeOutCubic(st))}px)`;
+    }
+  }
+
+  // ===== SCENE 2: INTRO (7.4-23.2s) =====
+  if (t >= 7.4 && t < 23.2) {
+    const scene = document.getElementById('scene2');
+    let op = fadeIn(t, 7.4, 0.6);
+    if (t > 22.2) op *= fadeOut(t, 22.2, 1.0);
+    scene.style.opacity = String(op);
+
+    // Title
+    scene.querySelector('.scene-title').style.opacity = String(fadeIn(t, 7.4, 0.6));
+
+    // Phone slides in from left at 8s
+    const phone = document.getElementById('s2phone');
+    const pt = clamp01((t - 8) / 0.8);
+    const px = easeOutCubic(pt);
+    phone.style.opacity = String(px);
+    phone.style.transform = `translateX(${-400 * (1 - px)}px)`;
+
+    // Cross-fade to img2 at 13s
+    const img1 = document.getElementById('s2img1');
+    const img2 = document.getElementById('s2img2');
+    if (t < 13) {
+      img1.style.opacity = '1'; img2.style.opacity = '0';
+    } else {
+      const cf = clamp01((t - 13) / 0.8);
+      img1.style.opacity = String(1 - cf);
+      img2.style.opacity = String(cf);
+    }
+
+    // Label
+    const label = document.getElementById('s2label');
+    label.style.opacity = String(fadeIn(t, 8.5, 0.5));
+    if (t >= 13) {
+      label.textContent = 'Brain Dump Shortcut';
+    } else {
+      label.textContent = 'iPhone Shortcuts';
+    }
+  }
+
+  // ===== SCENE 3: BUILD DICTATE (23.2-54.0s) =====
+  if (t >= 23.2 && t < 54.0) {
+    const scene = document.getElementById('scene3');
+    let op = fadeIn(t, 23.2, 0.6);
+    if (t > 53.0) op *= fadeOut(t, 53.0, 1.0);
+    scene.style.opacity = String(op);
+
+    scene.querySelector('.scene-title').style.opacity = String(fadeIn(t, 23.2, 0.6));
+
+    // Phone 1 slides in at 24s
+    const p1 = document.getElementById('s3phone1');
+    const p1t = clamp01((t - 24) / 0.8);
+    p1.style.opacity = String(easeOutCubic(p1t));
+    p1.style.transform = `translateX(${-400 * (1 - easeOutCubic(p1t))}px)`;
+    document.getElementById('s3label1').style.opacity = String(fadeIn(t, 24.5, 0.5));
+
+    // Phone 2 slides in at 28s
+    const p2 = document.getElementById('s3phone2');
+    const p2t = clamp01((t - 28) / 0.8);
+    p2.style.opacity = String(easeOutCubic(p2t));
+    p2.style.transform = `translateX(${400 * (1 - easeOutCubic(p2t))}px)`;
+    document.getElementById('s3label2').style.opacity = String(fadeIn(t, 28.5, 0.5));
+
+    // Annotation
+    const annot = document.getElementById('s3annot');
+    annot.style.opacity = String(fadeIn(t, 32, 0.8));
+  }
+
+  // ===== SCENE 4: BUILD TIMESTAMP (54.0-96.2s) =====
+  if (t >= 54.0 && t < 96.2) {
+    const scene = document.getElementById('scene4');
+    let op = fadeIn(t, 54.0, 0.6);
+    if (t > 95.2) op *= fadeOut(t, 95.2, 1.0);
+    scene.style.opacity = String(op);
+
+    scene.querySelector('.scene-title').style.opacity = String(fadeIn(t, 54.0, 0.6));
+
+    // Phone center
+    const phone = document.getElementById('s4phone');
+    const pt = clamp01((t - 55) / 0.8);
+    phone.style.opacity = String(easeOutCubic(pt));
+    phone.style.transform = `scale(${0.9 + 0.1 * easeOutCubic(pt)})`;
+
+    // Glow pulse
+    if (t > 56) {
+      const pulse = Math.sin((t - 56) * 1.5) * 0.5 + 0.5;
+      const glow = 15 + pulse * 25;
+      phone.style.boxShadow = `0 0 ${glow}px rgba(0,245,255,${0.15 + pulse * 0.15}), 0 0 ${glow * 2}px rgba(0,245,255,0.05)`;
+    }
+
+    // Format overlay
+    document.getElementById('s4format').style.opacity = String(fadeIn(t, 58, 0.8));
+    document.getElementById('s4preview').style.opacity = String(fadeIn(t, 62, 0.8));
+  }
+
+  // ===== SCENE 5: BUILD SAVE (96.2-134.0s) =====
+  if (t >= 96.2 && t < 134.0) {
+    const scene = document.getElementById('scene5');
+    let op = fadeIn(t, 96.2, 0.6);
+    if (t > 133.0) op *= fadeOut(t, 133.0, 1.0);
+    scene.style.opacity = String(op);
+
+    scene.querySelector('.scene-title').style.opacity = String(fadeIn(t, 96.2, 0.6));
+
+    // Phone
+    const phone = document.getElementById('s5phone');
+    phone.style.opacity = String(fadeIn(t, 97, 0.8));
+
+    // Annotations appear in sequence
+    document.getElementById('s5a1').style.opacity = String(fadeIn(t, 98, 0.8));
+    document.getElementById('s5a2').style.opacity = String(fadeIn(t, 105, 0.8));
+    
+    const a3 = document.getElementById('s5a3');
+    a3.style.opacity = String(fadeIn(t, 112, 0.8));
+  }
+
+  // ===== SCENE 6: BUILD RENAME (134.0-178.7s) =====
+  if (t >= 134.0 && t < 178.7) {
+    const scene = document.getElementById('scene6');
+    let op = fadeIn(t, 134.0, 0.6);
+    if (t > 177.7) op *= fadeOut(t, 177.7, 1.0);
+    scene.style.opacity = String(op);
+
+    scene.querySelector('.scene-title').style.opacity = String(fadeIn(t, 134.0, 0.6));
+
+    // Phone on left
+    document.getElementById('s6phone').style.opacity = String(fadeIn(t, 135, 0.8));
+
+    // Steps card
+    document.getElementById('s6card').style.opacity = String(fadeIn(t, 136, 0.8));
+
+    // Checkmarks appearing one by one starting at 140s, 2s spacing
+    for (let i = 1; i <= 7; i++) {
+      const checkTime = 140 + (i - 1) * 2;
+      document.getElementById('ck' + i).style.opacity = String(fadeIn(t, checkTime, 0.5));
+    }
+
+    // Filename preview appears after all checks
+    document.getElementById('s6filename').style.opacity = String(fadeIn(t, 155, 0.8));
+  }
+
+  // ===== SCENE 7: DEMO (178.7-215.9s) =====
+  if (t >= 178.7 && t < 215.9) {
+    const scene = document.getElementById('scene7');
+    let op = fadeIn(t, 178.7, 0.6);
+    if (t > 214.9) op *= fadeOut(t, 214.9, 1.0);
+    scene.style.opacity = String(op);
+
+    // "Demo" title fades in then out
+    const s7title = document.getElementById('s7title');
+    if (t < 179.5) {
+      s7title.style.opacity = String(fadeIn(t, 178.7, 0.5));
+    } else if (t < 180) {
+      s7title.style.opacity = String(fadeOut(t, 179.5, 0.5));
+    } else {
+      s7title.style.opacity = '0';
+    }
+
+    // Phone
+    const phone = document.getElementById('s7phone');
+    phone.style.opacity = String(fadeIn(t, 180, 0.6));
+
+    // Images and states
+    const img1 = document.getElementById('s7img1');
+    const mic = document.getElementById('s7mic');
+    const notif = document.getElementById('s7notif');
+    const img2 = document.getElementById('s7img2');
+
+    // Default states
+    img1.style.opacity = '1';
+    mic.style.opacity = '0';
+    img2.style.opacity = '0';
+    notif.style.top = '-120px';
+
+    if (t >= 185 && t < 192) {
+      // Recording state
+      const cf1 = clamp01((t - 185) / 0.8);
+      img1.style.opacity = String(1 - cf1);
+      mic.style.opacity = String(cf1);
+      // Pulsing red ring
+      const ring = document.getElementById('s7ring');
+      const pulse = Math.sin((t - 185) * 4) * 0.5 + 0.5;
+      ring.style.boxShadow = `0 0 ${20 + pulse * 30}px rgba(255,68,68,${0.3 + pulse * 0.4})`;
+      ring.style.borderColor = `rgba(255,68,68,${0.6 + pulse * 0.4})`;
+    } else if (t >= 192 && t < 196) {
+      // Notification popup
+      mic.style.opacity = '1';
+      img1.style.opacity = '0';
+      const nt = clamp01((t - 192) / 0.6);
+      notif.style.top = `${-120 + easeOutCubic(nt) * 160}px`;
+    } else if (t >= 196) {
+      // Files result
+      const cf2 = clamp01((t - 196) / 0.8);
+      mic.style.opacity = String(1 - cf2);
+      img1.style.opacity = '0';
+      img2.style.opacity = String(cf2);
+    }
+
+    // Label
+    const label = document.getElementById('s7label');
+    if (t >= 196) {
+      label.textContent = 'Saved to iCloud';
+      label.style.opacity = String(fadeIn(t, 196.5, 0.5));
+      label.style.color = '#39FF14';
+      label.style.textShadow = '0 0 15px rgba(57,255,20,0.4)';
+    } else {
+      label.style.opacity = '0';
+    }
+
+    // Timer overlay (0-10s counting from 180s)
+    const timer = document.getElementById('s7timer');
+    if (t >= 180 && t < 196) {
+      timer.style.opacity = '1';
+      const elapsed = Math.min(10, t - 180);
+      timer.textContent = elapsed.toFixed(1) + 's';
+    } else {
+      timer.style.opacity = '0';
+    }
+  }
+
+  // ===== SCENE 8: POWER TIPS (215.9-256.8s) =====
+  if (t >= 215.9 && t < 256.8) {
+    const scene = document.getElementById('scene8');
+    let op = fadeIn(t, 215.9, 0.6);
+    if (t > 255.8) op *= fadeOut(t, 255.8, 1.0);
+    scene.style.opacity = String(op);
+
+    scene.querySelector('.scene-title').style.opacity = String(fadeIn(t, 215.9, 0.6));
+
+    // Cards with staggered spring-in
+    const tips = [
+      { el: 'tip1', time: 218 },
+      { el: 'tip2', time: 225 },
+      { el: 'tip3', time: 232 },
+    ];
+    tips.forEach(tip => {
+      const el = document.getElementById(tip.el);
+      const ct = clamp01((t - tip.time) / 0.8);
+      const spring = ct > 0 ? (1 + Math.sin(ct * Math.PI * 2) * (1 - ct) * 0.12) : 1;
+      const scale = easeOutCubic(ct) * spring;
+      el.style.opacity = String(easeOutCubic(ct));
+      el.style.transform = `translateY(${60 * (1 - easeOutCubic(ct))}px) scale(${0.8 + 0.2 * scale})`;
+    });
+  }
+
+  // ===== SCENE 9: CTA (256.8-275s) =====
+  if (t >= 256.8 && t <= 275) {
+    const scene = document.getElementById('scene9');
+    scene.style.opacity = String(fadeIn(t, 256.8, 0.6));
+
+    // Glow orbs
+    scene.querySelectorAll('.glow-orb').forEach(o => {
+      o.style.opacity = String(clamp01((t - 256.8) / 2));
+    });
+
+    // Brand text with glow pulse
+    const brand = scene.querySelector('.brand');
+    brand.style.opacity = String(fadeIn(t, 257.5, 1.0));
+    const pulse = Math.sin((t - 257.5) * 2) * 0.5 + 0.5;
+    brand.style.textShadow = `0 0 ${40 + pulse * 40}px rgba(0,245,255,${0.3 + pulse * 0.3}), 0 0 ${80 + pulse * 60}px rgba(0,245,255,${0.1 + pulse * 0.15})`;
+
+    // Subtitle
+    const sub = scene.querySelector('.cta-sub');
+    sub.style.opacity = String(fadeIn(t, 260, 1.2));
+  }
+}
+
+// Expose to Puppeteer
+window.setFrame = setFrame;
+window.TOTAL_FRAMES = TOTAL_FRAMES;
+window.FPS = FPS;
+
+// Autoplay unless Puppeteer
+if (!window.__PUPPETEER__) {
+  let currentFrame = 0;
+  function tick() {
+    setFrame(currentFrame);
+    currentFrame++;
+    if (currentFrame <= TOTAL_FRAMES) requestAnimationFrame(tick);
+  }
+  tick();
+}
+</script>
+</body>
+</html>

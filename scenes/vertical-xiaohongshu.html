@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+  body {
+    width: 1080px; height: 1920px;
+    background: #0A0A0A;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #FFFFFF;
+    position: relative;
+  }
+  .scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+
+  /* Dot grid */
+  .dot-grid {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.35) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.08;
+  }
+
+  /* Glowing orbs */
+  .orb { position: absolute; border-radius: 50%; filter: blur(120px); }
+  .orb-cyan { width: 500px; height: 500px; background: #00F5FF; top: -100px; left: -100px; opacity: 0.15; }
+  .orb-magenta { width: 500px; height: 500px; background: #FF00FF; bottom: -100px; right: -100px; opacity: 0.15; }
+
+  /* Scene 1 */
+  .scene1-content {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; width: 100%;
+  }
+  .title-wrap { text-align: center; }
+  .title-brain { font-size: 120px; font-weight: 800; color: #FFFFFF; line-height: 1.1; }
+  .title-dump { font-size: 120px; font-weight: 800; color: #00F5FF; line-height: 1.1;
+    text-shadow: 0 0 30px rgba(0,245,255,0.6), 0 0 60px rgba(0,245,255,0.3); }
+  .accent-line { width: 400px; height: 4px; margin: 30px auto;
+    background: linear-gradient(90deg, #00F5FF, #FF00FF); border-radius: 2px; }
+  .subtitle { font-size: 36px; color: rgba(255,255,255,0.7); text-align: center; margin-top: 16px; font-weight: 400; }
+
+  /* Scene 2 */
+  .scene2-title { text-align: center; margin-top: 100px; font-size: 56px; font-weight: 700; }
+  .scene2-title .cyan { color: #00F5FF; }
+  .pipeline { display: flex; flex-direction: column; align-items: center; margin-top: 60px; }
+  .pipe-step { display: flex; align-items: center; width: 400px; height: 100px;
+    background: rgba(0,245,255,0.08); border: 1.5px solid rgba(0,245,255,0.3);
+    border-radius: 20px; padding: 0 24px; gap: 18px;
+    backdrop-filter: blur(10px); position: relative; }
+  .pipe-step.final { border-color: rgba(57,255,20,0.4); background: rgba(57,255,20,0.08);
+    box-shadow: 0 0 20px rgba(57,255,20,0.15); }
+  .pipe-step svg { width: 48px; height: 48px; flex-shrink: 0; }
+  .pipe-label { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+  .pipe-arrow { display: flex; flex-direction: column; align-items: center; height: 40px; position: relative; }
+  .pipe-arrow-line { width: 4px; flex: 1; background: linear-gradient(180deg, #FF00FF, #00F5FF); border-radius: 2px; }
+  .pipe-arrow-head { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
+    border-top: 10px solid #00F5FF; }
+
+  /* Scene 3 */
+  .scene3-top { position: absolute; top: 60px; left: 0; width: 100%; height: 880px; }
+  .scene3-bottom { position: absolute; top: 980px; left: 0; width: 100%; height: 880px; }
+  .scene3-divider { position: absolute; top: 940px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); }
+  .before-title { text-align: center; font-size: 52px; font-weight: 700; color: #FF00FF; margin-top: 30px; }
+  .after-title { text-align: center; font-size: 52px; font-weight: 700; color: #39FF14; margin-top: 30px; }
+  .chaos-thought { position: absolute; font-weight: 600; opacity: 0.85; }
+  .file-card { display: flex; align-items: center; width: 420px; height: 70px;
+    margin: 10px auto; border-radius: 14px; padding: 0 20px; gap: 14px;
+    background: rgba(57,255,20,0.06); border: 1.5px solid rgba(57,255,20,0.3); }
+  .file-card svg { width: 32px; height: 32px; flex-shrink: 0; }
+  .file-info { display: flex; flex-direction: column; }
+  .file-name { font-size: 22px; font-weight: 600; color: #FFFFFF; }
+  .file-date { font-size: 16px; color: rgba(255,255,255,0.4); }
+</style>
+</head>
+<body>
+  <div class="dot-grid"></div>
+  <div class="orb orb-cyan"></div>
+  <div class="orb orb-magenta"></div>
+
+  <!-- SCENE 1: Brain Dump Intro -->
+  <div class="scene" id="scene1">
+    <div class="scene1-content">
+      <div class="title-wrap" id="title-wrap">
+        <div class="title-brain">Brain</div>
+        <div class="title-dump">Dump</div>
+      </div>
+      <div class="accent-line" id="accent-line"></div>
+      <div class="subtitle" id="subtitle">Capture ideas in 10 seconds</div>
+    </div>
+  </div>
+
+  <!-- SCENE 2: Workflow Pipeline -->
+  <div class="scene" id="scene2">
+    <div class="scene2-title">How It <span class="cyan">Works</span></div>
+    <div class="pipeline" id="pipeline"></div>
+  </div>
+
+  <!-- SCENE 3: Before/After -->
+  <div class="scene" id="scene3">
+    <div class="scene3-top">
+      <div class="before-title">Before</div>
+      <div id="chaos-container" style="position:relative;width:100%;height:750px;"></div>
+    </div>
+    <div class="scene3-divider" id="divider"></div>
+    <div class="scene3-bottom">
+      <div class="after-title">After</div>
+      <div id="files-container" style="margin-top:30px;"></div>
+    </div>
+  </div>
+
+<script>
+const FPS = 30;
+const DURATION = 20;
+const TOTAL_FRAMES = FPS * DURATION;
+window.FPS = FPS;
+window.TOTAL_FRAMES = TOTAL_FRAMES;
+
+// Easing functions
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function spring(t, damping = 0.6, freq = 4.5) {
+  return 1 - Math.exp(-damping * t * 10) * Math.cos(freq * t * Math.PI * 2);
+}
+function clamp(v, a = 0, b = 1) { return Math.max(a, Math.min(b, v)); }
+function lerp(a, b, t) { return a + (b - a) * clamp(t); }
+
+// Pipeline data
+const pipeSteps = [
+  { label: 'Voice', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>' },
+  { label: 'Dictate', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' },
+  { label: 'Format Date', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>' },
+  { label: 'Save', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00F5FF" stroke-width="1.8"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>' },
+  { label: '.md File', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>', final: true }
+];
+
+// Build pipeline DOM
+const pipelineEl = document.getElementById('pipeline');
+pipeSteps.forEach((step, i) => {
+  if (i > 0) {
+    const arrow = document.createElement('div');
+    arrow.className = 'pipe-arrow';
+    arrow.id = `arrow-${i}`;
+    arrow.innerHTML = '<div class="pipe-arrow-line"></div><div class="pipe-arrow-head"></div>';
+    pipelineEl.appendChild(arrow);
+  }
+  const node = document.createElement('div');
+  node.className = 'pipe-step' + (step.final ? ' final' : '');
+  node.id = `node-${i}`;
+  node.innerHTML = step.icon + `<span class="pipe-label">${step.label}</span>`;
+  pipelineEl.appendChild(node);
+});
+
+// Chaos thoughts
+const chaosThoughts = [
+  { text: 'shower idea...', x: 80, y: 80, size: 32, color: '#FF00FF', rot: -8 },
+  { text: 'car thought', x: 550, y: 160, size: 28, color: '#00F5FF', rot: 12 },
+  { text: '3am insight!', x: 200, y: 280, size: 36, color: '#FF00FF', rot: -5 },
+  { text: 'quick note?', x: 600, y: 380, size: 30, color: '#FFFFFF', rot: 7 },
+  { text: 'billion $ idea', x: 120, y: 470, size: 34, color: '#00F5FF', rot: -12 },
+  { text: 'what was it...', x: 500, y: 560, size: 28, color: 'rgba(255,255,255,0.5)', rot: 3 },
+  { text: 'forgot again', x: 280, y: 650, size: 30, color: '#FF00FF', rot: -6 }
+];
+const chaosContainer = document.getElementById('chaos-container');
+chaosThoughts.forEach((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'chaos-thought';
+  el.id = `chaos-${i}`;
+  el.textContent = t.text;
+  el.style.cssText = `left:${t.x}px;top:${t.y}px;font-size:${t.size}px;color:${t.color};transform:rotate(${t.rot}deg);`;
+  chaosContainer.appendChild(el);
+});
+
+// File cards
+const files = [
+  { name: 'shower-idea.md', date: '2025-04-12' },
+  { name: 'car-thought.md', date: '2025-04-12' },
+  { name: '3am-insight.md', date: '2025-04-11' },
+  { name: 'billion-dollar.md', date: '2025-04-10' },
+  { name: 'quick-note.md', date: '2025-04-10' }
+];
+const filesContainer = document.getElementById('files-container');
+const docSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>';
+files.forEach((f, i) => {
+  const card = document.createElement('div');
+  card.className = 'file-card';
+  card.id = `file-${i}`;
+  card.innerHTML = docSvg + `<div class="file-info"><span class="file-name">${f.name}</span><span class="file-date">${f.date}</span></div>`;
+  filesContainer.appendChild(card);
+});
+
+// ANIMATION
+function setFrame(frame) {
+  const t = frame / FPS; // time in seconds
+
+  // Scene visibility
+  const scene1 = document.getElementById('scene1');
+  const scene2 = document.getElementById('scene2');
+  const scene3 = document.getElementById('scene3');
+
+  // SCENE 1: 0-5s
+  if (t < 5) {
+    scene1.style.opacity = 1;
+    scene2.style.opacity = 0;
+    scene3.style.opacity = 0;
+
+    // Spring scale on title
+    const titleT = clamp(t / 1.5);
+    const s = lerp(0.3, 1.0, spring(titleT, 0.5, 3));
+    const titleWrap = document.getElementById('title-wrap');
+    titleWrap.style.transform = `scale(${s})`;
+
+    // Accent line width
+    const lineT = clamp((t - 0.8) / 0.8);
+    document.getElementById('accent-line').style.transform = `scaleX(${easeOutCubic(lineT)})`;
+
+    // Subtitle fade
+    const subT = clamp((t - 1.4) / 0.6);
+    document.getElementById('subtitle').style.opacity = easeOutCubic(subT);
+
+    // Fade out
+    if (t > 4.2) {
+      const fadeT = clamp((t - 4.2) / 0.8);
+      scene1.style.opacity = 1 - easeOutCubic(fadeT);
+    }
+  }
+  // SCENE 2: 5-13s
+  else if (t < 13) {
+    scene1.style.opacity = 0;
+    scene2.style.opacity = 1;
+    scene3.style.opacity = 0;
+
+    const st = t - 5; // scene-local time
+
+    // Fade in
+    if (st < 0.5) {
+      scene2.style.opacity = easeOutCubic(st / 0.5);
+    }
+
+    // Stagger nodes
+    for (let i = 0; i < 5; i++) {
+      const nodeDelay = i * 0.7;
+      const nodeT = clamp((st - 0.5 - nodeDelay) / 0.8);
+      const node = document.getElementById(`node-${i}`);
+      const springVal = spring(nodeT, 0.55, 3.5);
+      const x = lerp(300, 0, springVal);
+      const op = clamp(nodeT * 3);
+      node.style.transform = `translateX(${x}px)`;
+      node.style.opacity = op;
+
+      // Glow pulse after appearing
+      if (nodeT > 0.8) {
+        const pulseT = ((st - 0.5 - nodeDelay - 0.8) % 2) / 2;
+        const glow = 5 + Math.sin(pulseT * Math.PI * 2) * 8;
+        const color = i === 4 ? '57,255,20' : '0,245,255';
+        node.style.boxShadow = `0 0 ${glow}px rgba(${color},0.3)`;
+      }
+
+      // Arrow
+      if (i > 0) {
+        const arrow = document.getElementById(`arrow-${i}`);
+        const arrowT = clamp((st - 0.5 - nodeDelay + 0.3) / 0.5);
+        arrow.style.opacity = easeOutCubic(arrowT);
+        arrow.style.transform = `scaleY(${easeOutCubic(arrowT)})`;
+      }
+    }
+
+    // Fade out
+    if (st > 7.2) {
+      const fadeT = clamp((st - 7.2) / 0.8);
+      scene2.style.opacity = 1 - easeOutCubic(fadeT);
+    }
+  }
+  // SCENE 3: 13-20s
+  else {
+    scene1.style.opacity = 0;
+    scene2.style.opacity = 0;
+    scene3.style.opacity = 1;
+
+    const st = t - 13; // scene-local time
+
+    // Fade in
+    if (st < 0.5) {
+      scene3.style.opacity = easeOutCubic(st / 0.5);
+    }
+
+    // Chaos thoughts with floating
+    chaosThoughts.forEach((ct, i) => {
+      const el = document.getElementById(`chaos-${i}`);
+      const chaosT = clamp((st - i * 0.15) / 0.6);
+      const op = easeOutCubic(chaosT);
+      // Float animation
+      const floatY = Math.sin((t + i * 1.3) * 1.2) * 8;
+      const floatR = ct.rot + Math.sin((t + i * 0.7) * 0.9) * 3;
+      el.style.opacity = op;
+      el.style.transform = `rotate(${floatR}deg) translateY(${floatY}px)`;
+    });
+
+    // Divider
+    const divT = clamp((st - 1.5) / 0.6);
+    document.getElementById('divider').style.opacity = easeOutCubic(divT);
+
+    // File cards stagger
+    files.forEach((f, i) => {
+      const el = document.getElementById(`file-${i}`);
+      const fileT = clamp((st - 2.5 - i * 0.3) / 0.7);
+      const springVal = spring(fileT, 0.55, 3.5);
+      const x = lerp(400, 0, springVal);
+      const op = clamp(fileT * 3);
+      el.style.transform = `translateX(${x}px)`;
+      el.style.opacity = op;
+    });
+  }
+}
+
+window.setFrame = setFrame;
+
+// Auto-play if not in Puppeteer
+if (!window.__PUPPETEER__) {
+  let frame = 0;
+  function tick() {
+    setFrame(frame);
+    frame++;
+    if (frame <= TOTAL_FRAMES) requestAnimationFrame(tick);
+  }
+  tick();
+}
+</script>
+</body>
+</html>
